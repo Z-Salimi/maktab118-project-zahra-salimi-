@@ -1,0 +1,13 @@
+** Zahra Salimi (Final Project)
+
+- لینک گیت هاب با https:
+https://github.com/Z-Salimi/Maktab118-Project-Zahra-Salimi.git
+
+
+
+- با ssh:
+
+git@github.com:Z-Salimi/Maktab118-Project-Zahra-Salimi.git
+
+- لینک بورد trello:
+https://trello.com/invite/b/67475cd827061ce1d8696d27/ATTIcb7a7ed6d999a543766f21543c0564bf522F6BC0/shop-project
