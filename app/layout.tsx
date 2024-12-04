@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/providers/toastify.provider";
+import RouteGuard from "@/providers/routeGuard";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,11 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fa" dir="rtl">
+      <head> <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet" /> </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <RouteGuard>
         <ToastProvider>{children}</ToastProvider>
+        </RouteGuard>
       </body>
     </html>
   );
