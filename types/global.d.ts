@@ -1,6 +1,10 @@
-interface IResDto{
-    page : number;
-    perPage : number;
-    totalPages : number;
-    totalItems : number;
-}
+interface IResDto {
+    status: string;
+    page: number;
+    perPage: number;
+    totalPages: number;
+    total: number;
+    data: {
+      products: IProduct[];
+    };
+  }

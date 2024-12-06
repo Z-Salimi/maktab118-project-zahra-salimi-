@@ -28,7 +28,7 @@ export const LoginForm: React.FC = () => {
   const onSubmit = async (data: IForm) => {
     try {
       const token = await loginRequest(data.userName, data.password);
-      router.push("/admin/orders");
+      router.push("/admin/management/manageProduct");
       toast.success("ورود موفقیت آمیز بود");
     } catch (error) {
       toast.error("ورود با شکست مواجه شد");
