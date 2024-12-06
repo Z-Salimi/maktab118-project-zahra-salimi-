@@ -76,7 +76,7 @@ export const AllProductManage: React.FC = () => {
       <div className="flex justify-center w-full">
         <div className="w-full text-sm text-center bg-slate-50">
           <table className="w-full table-auto bg-white">
-            <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table">
+            <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table table-fixed">
               <tr>
                 <th className="px-6 py-3 cursor-pointer">تصویر</th>
                 <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">
@@ -88,10 +88,11 @@ export const AllProductManage: React.FC = () => {
                 <th className="px-6 py-3">عملیات</th>
               </tr>
             </thead>
-            <tbody className="bg-slate-50 h-[70vh] overflow-y-auto block w-full">
+            <tbody dir="ltr" className="bg-slate-50 h-[70vh] overflow-y-auto block w-full">
               {Array.isArray(products) &&
                 products.map((product) => (
                   <tr
+                  dir="rtl"
                     key={product._id}
                     className="border-b-2 border-gray-300 w-full table table-fixed"
                   >
