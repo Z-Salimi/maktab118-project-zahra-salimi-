@@ -11,5 +11,7 @@ export const urls={
     },
     subCategories:{
         byId: "http://localhost:8000/api/subcategories",
-    }
+    },
+    orders:"http://localhost:8000/api/orders",
+    users:"http://localhost:8000/api/users",
 }
