@@ -15,6 +15,8 @@ export default {
       },
       backgroundImage: {
         'backManage': "url('/img9.jpg')",
+        'backStock': "url('/img13.jpg')",
+        'backOrder': "url('/img17.webp')",
       }
     },
   },
