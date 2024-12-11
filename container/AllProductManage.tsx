@@ -98,7 +98,7 @@ export const AllProductManage: React.FC = () => {
                   >
                     <td className="px-6 py-4 flex justify-center items-center">
                       <img
-                        src={`http://localhost:8000/images/products/images/${product.images[0]}`}
+                        src={}
                         className="w-50 h-20 rounded-lg"
                         alt=""
                       />
