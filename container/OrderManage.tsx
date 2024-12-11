@@ -36,7 +36,7 @@ export const OrderManage: React.FC = () => {
         console.log('Fetched user data:', userData);
         
         const orders = orderData.data.orders;
-        const users = Array.isArray(userData) ? userData : [];
+        const users = Array.isArray(userData.users) ? userData.users : [];
         users.forEach(user => console.log('User:', user._id, user.firstname, user.lastname));
 
         const groupedOrders = groupOrdersByUser(orders, users);
@@ -60,6 +60,8 @@ export const OrderManage: React.FC = () => {
 
     orders.forEach((order) => {
       if (!userOrdersMap[order.user]) {
+        console.log("usersss:" ,users);
+        
         const user = users.find((u) => u._id === order.user);
         console.log('Order user ID:', order.user, 'Matched user:', user);
         const userName = user ? `${user.firstname} ${user.lastname}` : 'نامشخص';

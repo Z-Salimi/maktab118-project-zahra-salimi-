@@ -25,3 +25,30 @@ export const getProductList = async (page = 1, limit = 10): Promise<IAllProducts
     throw new Error('Failed to fetch products');
   }
 };
+
+export const updateProduct = async (productId: string, updatedProduct: IProduct) => {
+  try {
+    const formData = new FormData();
+    formData.append('name', updatedProduct.name);
+    formData.append('category', updatedProduct.category);
+    if (updatedProduct.images) {
+      formData.append('images', updatedProduct.images[0]);
+    }
+
+    const response = await fetch(`https://api.example.com/products/${productId}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update product');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+};
+
