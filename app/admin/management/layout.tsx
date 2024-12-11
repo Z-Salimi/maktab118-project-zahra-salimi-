@@ -1,4 +1,3 @@
-// app/admin/management/layout.tsx
 import { NavbarManagement } from "@/components/navbarManage";
 import React from "react";
 
