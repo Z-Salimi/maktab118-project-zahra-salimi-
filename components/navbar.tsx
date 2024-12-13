@@ -5,7 +5,7 @@ import { Button } from "./button";
 
 export const Navbar: React.FC = () => {
   return (
-    <header className="px-6 py-3 flex justify-around items-center gap-4 w-full bg-gray-200">
+    <header className="px-6 py-2 flex justify-around items-center gap-4 w-full bg-gray-200">
       <img src="digizarger.png" alt="Logo" className="w-64" />
       <div className="w-[30vw]">
         <Input type="search" placeholder="جستجو..." />

@@ -1,11 +1,12 @@
 "use client";
-import { getProductList } from "@/apis/services/product.service";
+import { deleteProduct, getProductList, updateProduct } from "@/apis/services/product.service";
 import { getCategoryById } from "@/apis/services/category.service";
 import { getSubCategoryById } from "@/apis/services/subCategory.service";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/button";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
+import { UpdateModal } from "@/components/updateModal";
 
 export const AllProductManage: React.FC = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -17,24 +18,21 @@ export const AllProductManage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const productsPerPage = 10;
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await getProductList(currentPage, productsPerPage);
-        console.log("Fetched data:", data);
         setProducts(data.products);
         setTotalProducts(data.total);
-        console.log("Total products set:", data.total);
-
         const categoryNames: Record<string, string> = {};
         for (const product of data.products) {
           const categoryData = await getCategoryById(product.category);
           categoryNames[product.category] = categoryData.category.name;
         }
         setCategories(categoryNames);
-
         const subCategoryNames: Record<string, string> = {};
         for (const product of data.products) {
           const subCategoryData = await getSubCategoryById(product.subcategory);
@@ -42,7 +40,6 @@ export const AllProductManage: React.FC = () => {
             subCategoryData.subcategory.name;
         }
         setSubCategories(subCategoryNames);
-
         setLoading(false);
       } catch (error: any) {
         console.error("Error in fetchProducts:", error);
@@ -52,22 +49,47 @@ export const AllProductManage: React.FC = () => {
     };
     fetchProducts();
   }, [currentPage]);
-
   const totalPages = Math.ceil(totalProducts / productsPerPage);
-  console.log("Total pages:", totalPages);
-
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
-
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
+  const closeModal = () => {
+    setSelectedProduct(null);
+    setIsOpen(false);
+  };
+  const openModal = (product: IProduct) => {
+    setSelectedProduct(product);
+    setIsOpen(true);
+  };
+  const handleUpdateProduct = async (updatedProduct: IProduct) => {
+    if (selectedProduct) {
+      try {
+        await updateProduct(selectedProduct._id, updatedProduct);
+        const data = await getProductList(currentPage, productsPerPage);
+        setProducts(data.products);
+        closeModal();
+      } catch (error) {
+        console.error("Failed to update product:", error);
+      }
+    }
+  };
 
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      const data = await getProductList(currentPage, productsPerPage);
+      setProducts(data.products);
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
+  };
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -88,11 +110,14 @@ export const AllProductManage: React.FC = () => {
                 <th className="px-6 py-3">عملیات</th>
               </tr>
             </thead>
-            <tbody dir="ltr" className="bg-slate-50 h-[70vh] overflow-y-auto block w-full">
+            <tbody
+              dir="ltr"
+              className="bg-slate-50 h-[70vh] overflow-y-auto block w-full"
+            >
               {Array.isArray(products) &&
                 products.map((product) => (
                   <tr
-                  dir="rtl"
+                    dir="rtl"
                     key={product._id}
                     className="border-b-2 border-gray-300 w-full table table-fixed"
                   >
@@ -114,10 +139,12 @@ export const AllProductManage: React.FC = () => {
                         <Button
                           text="ویرایش"
                           className="bg-green-600 hover:bg-green-700 rounded-md text-white"
+                          onClick={() => openModal(product)}
                         />
                         <Button
                           text="حذف"
                           className="bg-red-600 hover:bg-red-700 rounded-md text-white"
+                          onClick={()=> handleDeleteProduct(product._id)}
                         />
                       </div>
                     </td>
@@ -154,6 +181,13 @@ export const AllProductManage: React.FC = () => {
           </div>
         </div>
       </div>
+      {isOpen && selectedProduct && (
+        <UpdateModal
+          close={closeModal}
+          product={selectedProduct}
+          onProductUpdated={() => handleUpdateProduct(selectedProduct)}
+        />
+      )}
     </section>
   );
 };
