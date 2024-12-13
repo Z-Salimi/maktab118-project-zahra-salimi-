@@ -1,28 +1,14 @@
 "use client";
-
+import { deleteProduct, getProductList, updateProduct } from "@/apis/services/product.service";
+import { getCategoryById } from "@/apis/services/category.service";
+import { getSubCategoryById } from "@/apis/services/subCategory.service";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/button";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
-import { useFetchProducts } from "@/hooks/useFetchProducts";
-import { usePagination } from "@/hooks/usePagination";
-import { getProductList, updateProduct } from "@/apis/services/product.service";
-import { getCategoryById } from "@/apis/services/category.service";
-import { getSubCategoryById } from "@/apis/services/subCategory.service";
 import { UpdateModal } from "@/components/updateModal";
 
 export const AllProductManage: React.FC = () => {
-  // const productsPerPage = 10;
-  //  const { currentPage, totalPages, handleNextPage, handlePrevPage, setTotalPages } = usePagination(0, productsPerPage);
-  //   const { data, isLoading, error } = useFetchProducts(currentPage, productsPerPage);
-  //   console.log(data);
-
-  //    useEffect(() => {
-  //      if (data) {
-  //       setTotalPages(Math.ceil(data.total / productsPerPage));
-  //      }
-  //     }, [data , setTotalPages]);
-  //     const { products, categories, subCategories } = data;
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<Record<string, string>>({});
   const [subCategories, setSubCategories] = useState<Record<string, string>>(
@@ -32,10 +18,9 @@ export const AllProductManage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalProducts, setTotalProducts] = useState<number>(0);
-  const [isOpen, setIsOpen] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const productsPerPage = 10;
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -64,26 +49,23 @@ export const AllProductManage: React.FC = () => {
     };
     fetchProducts();
   }, [currentPage]);
-
   const totalPages = Math.ceil(totalProducts / productsPerPage);
-  console.log("Total pages:", totalPages);
-
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
-
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
-
   const closeModal = () => {
+    setSelectedProduct(null);
     setIsOpen(false);
   };
-  const openModal = () => {
+  const openModal = (product: IProduct) => {
+    setSelectedProduct(product);
     setIsOpen(true);
   };
   const handleUpdateProduct = async (updatedProduct: IProduct) => {
@@ -99,6 +81,15 @@ export const AllProductManage: React.FC = () => {
     }
   };
 
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      const data = await getProductList(currentPage, productsPerPage);
+      setProducts(data.products);
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    }
+  };
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -123,50 +114,42 @@ export const AllProductManage: React.FC = () => {
               dir="ltr"
               className="bg-slate-50 h-[70vh] overflow-y-auto block w-full"
             >
-              {products?.map?.((product) => (
-                <tr
-                  dir="rtl"
-<<<<<<< HEAD
+              {Array.isArray(products) &&
+                products.map((product) => (
+                  <tr
+                    dir="rtl"
                     key={product._id}
                     className="border-b-2 border-gray-300 w-full table table-fixed"
                   >
                     <td className="px-6 py-4 flex justify-center items-center">
                       <img
-                        src={}
+                        src={`http://localhost:8000/images/products/images/${product.images[0]}`}
                         className="w-50 h-20 rounded-lg"
                         alt=""
-=======
-                  key={product._id}
-                  className="border-b-2 border-gray-300 w-full table table-fixed"
-                >
-                  <td className="px-6 py-4 flex justify-center items-center">
-                    <img
-                      src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                      className="w-50 h-20 rounded-lg"
-                      alt=""
-                    />
-                  </td>
-                  <td className="px-6 py-4 border-x-2">{product.name}</td>
-                  <td className="px-6 py-4 border-x-2 border-gray-300">
-                    {categories[product.category] || "در حال بارگذاری..."}/
-                    {subCategories[product.subcategory] || "در حال بارگذاری..."}
-                  </td>
-                  <td className="px-6 py-4 ">
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        text="ویرایش"
-                        className="bg-green-600 hover:bg-green-700 rounded-md text-white"
-                        onClick={() => openModal()}
->>>>>>> feature/add_updateModal
                       />
-                      <Button
-                        text="حذف"
-                        className="bg-red-600 hover:bg-red-700 rounded-md text-white"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 border-x-2">{product.name}</td>
+                    <td className="px-6 py-4 border-x-2 border-gray-300">
+                      {categories[product.category] || "در حال بارگذاری..."}/
+                      {subCategories[product.subcategory] ||
+                        "در حال بارگذاری..."}
+                    </td>
+                    <td className="px-6 py-4 ">
+                      <div className="flex items-center justify-center gap-4">
+                        <Button
+                          text="ویرایش"
+                          className="bg-green-600 hover:bg-green-700 rounded-md text-white"
+                          onClick={() => openModal(product)}
+                        />
+                        <Button
+                          text="حذف"
+                          className="bg-red-600 hover:bg-red-700 rounded-md text-white"
+                          onClick={()=> handleDeleteProduct(product._id)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
           <div className="flex justify-center items-center gap-4 mt-4 py-2 bg-slate-300">
@@ -198,7 +181,13 @@ export const AllProductManage: React.FC = () => {
           </div>
         </div>
       </div>
-      {isOpen  && <UpdateModal close={closeModal} product={selectedProduct} onProductUpdated={() => handleUpdateProduct(selectedProduct)} />}
+      {isOpen && selectedProduct && (
+        <UpdateModal
+          close={closeModal}
+          product={selectedProduct}
+          onProductUpdated={() => handleUpdateProduct(selectedProduct)}
+        />
+      )}
     </section>
   );
 };
