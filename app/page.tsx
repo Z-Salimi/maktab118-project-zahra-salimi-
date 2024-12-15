@@ -11,7 +11,7 @@ export default function Home() {
     <section className="w-full container max-w-[1600px] mx-auto bg-slate-100">
       <div className="sticky top-0 z-40 bg-gray-200">
       <Navbar />
-      <FilterSideBar />
+      {/* <FilterSideBar /> */}
       </div>
         <ImageSlider />
         <Benefit />

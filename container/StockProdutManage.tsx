@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/button";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
+import { useTokenExpiration } from "@/hooks/loginExp";
 
 export const StockProductManage: React.FC = () => {
+  useTokenExpiration();
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
