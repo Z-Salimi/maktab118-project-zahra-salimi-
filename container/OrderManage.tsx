@@ -6,6 +6,7 @@ import { getUsers } from "@/apis/services/user.service";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { Button } from "@/components/button";
+import { useTokenExpiration } from "@/hooks/loginExp";
 
 interface IUserOrderSummary {
   userId: string;
@@ -17,6 +18,7 @@ interface IUserOrderSummary {
 }
 
 export const OrderManage: React.FC = () => {
+  useTokenExpiration();
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
