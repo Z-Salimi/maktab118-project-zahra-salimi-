@@ -1,14 +1,13 @@
-const userToken = "userSessionToken";
-
-export const setToken = (token: string) => {
-  localStorage.setItem(userToken, token);
+export const setToken = (token: string, expirationTime: number) => {
+  localStorage.setItem('authToken', token);
+  localStorage.setItem('tokenExpiration', (Date.now() + expirationTime).toString());
 };
 
 export const getToken = () => {
-  const token = localStorage.getItem(userToken);
-  return token;
+  return localStorage.getItem('authToken');
 };
 
-export const removeToken = () => {
-  localStorage.removeItem(userToken);
+export const clearToken = () => {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('tokenExpiration');
 };

@@ -9,6 +9,7 @@ import { LoginSchema } from "@/validation/login.validation";
 import { loginRequest } from "@/apis/services/auth.service";
 import { all } from "axios";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IForm {
   userName: string;
@@ -45,7 +46,7 @@ export const LoginForm: React.FC = () => {
       <div className="w-full">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full flex flex-col gap-y-10 mt-20"
+          className="w-full flex flex-col items-center gap-y-10 mt-20"
         >
           <Controller
             control={control}
@@ -74,11 +75,19 @@ export const LoginForm: React.FC = () => {
             )}
           />
           <button
-            className="bg-slate-700 hover:bg-slate-800 w-full mt-10 text-white font-semibold py-2 rounded-xl"
+            className="bg-slate-700 hover:bg-slate-800 w-full mt-4 text-white font-semibold py-2 rounded-xl"
             type="submit"
           >
             ورود
           </button>
+          <Link href={'/'} >
+          <button
+            className="= hover:bg-slate-300 w-full px-6 text-gray-600 font-semibold py-2 rounded-xl"
+            
+          >
+            برگشت به صفحه اصلی
+          </button>
+          </Link>
         </form>
       </div>
     </section>
