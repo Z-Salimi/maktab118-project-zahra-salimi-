@@ -32,7 +32,7 @@ export const LoginForm: React.FC = () => {
       router.push("/admin/management/manageProduct");
       toast.success("ورود موفقیت آمیز بود");
     } catch (error) {
-      toast.error("ورود با شکست مواجه شد");
+      toast.error("ورود ناموفق بود");
       console.error("Login failed:", error);
     }
   };
