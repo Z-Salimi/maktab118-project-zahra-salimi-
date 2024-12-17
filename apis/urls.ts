@@ -7,10 +7,10 @@ export const urls={
     },
     products:"http://localhost:8000/api/products",
     categories:{
-        byId: "http://localhost:8000/api/categories",
+        All: "http://localhost:8000/api/categories",
     },
     subCategories:{
-        byId: "http://localhost:8000/api/subcategories",
+        All: "http://localhost:8000/api/subcategories",
     },
     orders:"http://localhost:8000/api/orders",
     users:"http://localhost:8000/api/users",
