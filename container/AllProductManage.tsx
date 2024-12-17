@@ -1,103 +1,97 @@
 "use client";
-import { deleteProduct, getProductList, updateProduct } from "@/apis/services/product.service";
-import { getCategoryById } from "@/apis/services/category.service";
-import { getSubCategoryById } from "@/apis/services/subCategory.service";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/button";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { UpdateModal } from "@/components/updateModal";
 import { useTokenExpiration } from "@/hooks/loginExp";
+import { useDeleteProduct, useUpdateProduct } from "@/hooks/useProduct";
+import { useFetchProducts } from "@/hooks/useFetchProducts";
+import { DeleteModal } from "@/components/deleteModal";
+import { CreateModal } from "@/components/createModal";
 
 export const AllProductManage: React.FC = () => {
   useTokenExpiration();
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [categories, setCategories] = useState<Record<string, string>>({});
-  const [subCategories, setSubCategories] = useState<Record<string, string>>(
-    {}
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalProducts, setTotalProducts] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenCreate, setIsOpenCreate] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const productsPerPage = 10;
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProductList(currentPage, productsPerPage);
-        setProducts(data.products);
-        setTotalProducts(data.total);
-        const categoryNames: Record<string, string> = {};
-        for (const product of data.products) {
-          const categoryData = await getCategoryById(product.category);
-          categoryNames[product.category] = categoryData.category.name;
-        }
-        setCategories(categoryNames);
-        const subCategoryNames: Record<string, string> = {};
-        for (const product of data.products) {
-          const subCategoryData = await getSubCategoryById(product.subcategory);
-          subCategoryNames[product.subcategory] =
-            subCategoryData.subcategory.name;
-        }
-        setSubCategories(subCategoryNames);
-        setLoading(false);
-      } catch (error: any) {
-        console.error("Error in fetchProducts:", error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [currentPage]);
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  const { data, isLoading, isError, refetch } = useFetchProducts(
+    currentPage,
+    productsPerPage
+  );
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
+
+  const totalPages = data ? Math.ceil(data.total / productsPerPage) : 0;
+
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
+
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
+
   const closeModal = () => {
     setSelectedProduct(null);
     setIsOpen(false);
+    setIsOpenDelete(false);
+    setIsOpenCreate(false);
   };
+
   const openModal = (product: IProduct) => {
     setSelectedProduct(product);
     setIsOpen(true);
   };
+
+  const openModalDelete = (product: IProduct) => {
+    setSelectedProduct(product);
+    setIsOpenDelete(true);
+  };
+  const openModalCreate = () => {
+    setIsOpenCreate(true);
+  };
+
   const handleUpdateProduct = async (updatedProduct: IProduct) => {
     if (selectedProduct) {
-      try {
-        await updateProduct(selectedProduct._id, updatedProduct);
-        const data = await getProductList(currentPage, productsPerPage);
-        setProducts(data.products);
-        closeModal();
-      } catch (error) {
-        console.error("Failed to update product:", error);
-      }
+      updateProductMutation.mutate({
+        productId: selectedProduct._id,
+        updatedProduct,
+      });
+      closeModal();
     }
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    try {
-      await deleteProduct(productId);
-      const data = await getProductList(currentPage, productsPerPage);
-      setProducts(data.products);
-    } catch (error) {
-      console.error("Failed to delete product:", error);
+    if (selectedProduct) {
+      deleteProductMutation.mutate(selectedProduct._id);
+      closeModal();
     }
   };
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const handleCreateProduct = async () => {
+      closeModal();
+      refetch();
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {isError}</div>;
 
   return (
     <section className="flex flex-col p-10 w-full h-[90vh] rounded-xl">
-      <div className="flex justify-center w-full">
+      <div className="flex flex-col justify-center items-end gap-4 w-full">
+        <Button
+          text="افزودن"
+          className="bg-green-600 hover:bg-green-700 rounded-md text-white w-1/4"
+          onClick={openModalCreate}
+        />
         <div className="w-full text-sm text-center bg-slate-50">
           <table className="w-full table-auto bg-white">
             <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table table-fixed">
@@ -116,8 +110,8 @@ export const AllProductManage: React.FC = () => {
               dir="ltr"
               className="bg-slate-50 h-[70vh] overflow-y-auto block w-full"
             >
-              {Array.isArray(products) &&
-                products.map((product) => (
+              {Array.isArray(data?.products) &&
+                data.products.map((product) => (
                   <tr
                     dir="rtl"
                     key={product._id}
@@ -132,21 +126,24 @@ export const AllProductManage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 border-x-2">{product.name}</td>
                     <td className="px-6 py-4 border-x-2 border-gray-300">
-                      {categories[product.category] || "در حال بارگذاری..."}/
-                      {subCategories[product.subcategory] ||
+                      {data.categories[product.category] ||
+                        "در حال بارگذاری..."}
+                      /
+                      {data.subCategories[product.subcategory] ||
                         "در حال بارگذاری..."}
                     </td>
                     <td className="px-6 py-4 ">
                       <div className="flex items-center justify-center gap-4">
                         <Button
                           text="ویرایش"
-                          className="bg-green-600 hover:bg-green-700 rounded-md text-white"
+                          className="bg-slate-600 hover:bg-slate-700 rounded-md text-white"
                           onClick={() => openModal(product)}
                         />
                         <Button
                           text="حذف"
                           className="bg-red-600 hover:bg-red-700 rounded-md text-white"
-                          onClick={()=> handleDeleteProduct(product._id)}
+                          // onClick={() => handleDeleteProduct(product._id)}
+                          onClick={() => openModalDelete(product)}
                         />
                       </div>
                     </td>
@@ -188,6 +185,20 @@ export const AllProductManage: React.FC = () => {
           close={closeModal}
           product={selectedProduct}
           onProductUpdated={() => handleUpdateProduct(selectedProduct)}
+        />
+      )}
+      {isOpenDelete && selectedProduct && (
+        <DeleteModal
+          close={closeModal}
+          productName={selectedProduct.name}
+          productImage={selectedProduct.images[0]}
+          onConfirm={() => handleDeleteProduct(selectedProduct._id)}
+        />
+      )}
+      {isOpenCreate  && (
+        <CreateModal
+          close={closeModal}
+          onProductCreated={()=> handleCreateProduct()}
         />
       )}
     </section>

@@ -1,7 +1,7 @@
 interface ISubCategory {
   subcategory: {
     _id: string;
-    category: ICategory;
+    category: string;
     name: string;
     createdAt: string;
     updatedAt: string;
