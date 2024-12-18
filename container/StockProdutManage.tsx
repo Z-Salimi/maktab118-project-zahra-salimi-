@@ -1,49 +1,51 @@
 "use client";
-import { getProductList, updateProduct } from "@/apis/services/product.service";
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/button";
-import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { useTokenExpiration } from "@/hooks/loginExp";
+import { useFetchProducts } from "@/hooks/useFetchProducts";
+import { useUpdateProductStock } from "@/hooks/useProduct";
+import { toast } from "react-toastify";
+import { FaAnglesLeft } from "react-icons/fa6";
 
 export const StockProductManage: React.FC = () => {
   useTokenExpiration();
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editedValues, setEditedValues] = useState<{
+    [key: string]: { price?: number; quantity?: number };
+  }>({});
   const [changedProducts, setChangedProducts] = useState<IProduct[]>([]);
   const productsPerPage = 12;
+  const { data, error, isLoading } = useFetchProducts(
+    currentPage,
+    productsPerPage
+  );
+  const updateProductMutation = useUpdateProductStock();
+  const totalPages = data ? Math.ceil(data.total / productsPerPage) : 0;
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProductList(currentPage, productsPerPage);
-        setProducts(data.products);
-        setTotalProducts(data.total);
-        setLoading(false);
-      } catch (error: any) {
-        console.error("Error in fetchProducts:", error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [currentPage]);
-
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+    if (data) {
+      const initialEditedValues: {
+        [key: string]: { price?: number; quantity?: number };
+      } = {};
+      data.products.forEach((product) => {
+        initialEditedValues[product._id] = {
+          price: product.price,
+          quantity: product.quantity,
+        };
+      });
+      setEditedValues(initialEditedValues);
+    }
+  }, [data]);
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
   const handleInputChange = (
@@ -51,66 +53,78 @@ export const StockProductManage: React.FC = () => {
     field: keyof IProduct,
     value: string
   ) => {
-    const updatedProducts = products.map((product) => {
-      if (product._id === productId) {
-        return {
-          ...product,
-          [field]:
-            field === "price" || field === "quantity" ? Number(value) : value,
-        };
-      }
-      return product;
-    });
-    setProducts(updatedProducts);
-
-    let updatedChangedProducts = [...changedProducts];
-    const productExists = changedProducts.find(
-      (product) => product._id === productId
-    );
-
-    if (!productExists) {
-      const changedProduct = updatedProducts.find(
+    setEditedValues((prevValues) => ({
+      ...prevValues,
+      [productId]: {
+        ...prevValues[productId],
+        [field]:
+          field === "price" || field === "quantity" ? Number(value) : value,
+      },
+    }));
+    setChangedProducts((prevChangedProducts) => {
+      const changedProductIndex = prevChangedProducts.findIndex(
         (product) => product._id === productId
       );
-      if (changedProduct) {
-        updatedChangedProducts = [...updatedChangedProducts, changedProduct];
+      if (changedProductIndex === -1) {
+        const changedProduct = data?.products.find(
+          (product) => product._id === productId
+        );
+        return changedProduct
+          ? [
+              ...prevChangedProducts,
+              { ...changedProduct, [field]: Number(value) },
+            ]
+          : prevChangedProducts;
+      } else {
+        return prevChangedProducts.map((product, index) =>
+          index === changedProductIndex
+            ? { ...product, [field]: Number(value) }
+            : product
+        );
       }
-    } else {
-      updatedChangedProducts = updatedChangedProducts.map((product) => {
-        if (product._id === productId) {
-          return {
-            ...product,
-            [field]:
-              field === "price" || field === "quantity" ? Number(value) : value,
-          };
-        }
-        return product;
-      });
-    }
-    setChangedProducts(updatedChangedProducts);
+    });
   };
 
   const handleSave = async () => {
-    console.log(changedProducts);
-  
-    try {
-      const updatePromises = changedProducts.map((product) => {
-        console.log(product);
-        updateProduct(product._id, product)
+    const updatePromises = changedProducts.map((product) => {
+      const updatedProduct = { ...product, ...editedValues[product._id] };
+      return updateProductMutation.mutateAsync({
+        productId: product._id,
+        updatedProduct,
+      });
     });
+    try {
       await Promise.all(updatePromises);
-      
-      const data = await getProductList(currentPage, productsPerPage);
-      setProducts(data.products);
+      setEditingProductId(null);
       setChangedProducts([]);
-      console.log("Products updated successfully!");
+      setEditedValues({});
+      toast.success("تغییرات ذخیره شد");
     } catch (error) {
+      toast.error("خطا در ذخیره تغییرات");
       console.error("Failed to update products:", error);
     }
   };
-  
 
-  if (loading) return <div>Loading...</div>;
+  const handleFieldClick = (productId: string, field: "price" | "quantity") => {
+    setEditingProductId(productId);
+    const element = document.getElementById(`${productId}-${field}`);
+    if (element) {
+      element.focus();
+    }
+  };
+
+  const handleCancelEdit = (productId: string) => {
+    setEditedValues((prevValues) => {
+      const { [productId]: _, ...rest } = prevValues;
+      return rest;
+    });
+    setChangedProducts((prevChangedProducts) =>
+      prevChangedProducts.filter((product) => product._id !== productId)
+    );
+    setEditingProductId(null);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -142,18 +156,21 @@ export const StockProductManage: React.FC = () => {
               dir="ltr"
               className="bg-slate-100 h-[70vh] overflow-y-auto block w-full"
             >
-              {Array.isArray(products) &&
-                products.map((product) => (
-                  <tr
-                    dir="rtl"
-                    key={product._id}
-                    className="border-b-2 border-gray-400 w-full table table-fixed"
-                  >
-                    <td className="px-6 py-4 ">{product.name}</td>
-                    <td className="px-6 py-4 border-x-2 border-gray-400">
+              {data?.products.map((product) => (
+                <tr
+                  dir="rtl"
+                  key={product._id}
+                  className="border-b-2 border-gray-400 w-full table table-fixed"
+                >
+                  <td className="px-6 py-4 ">{product.name}</td>
+                  <td className="px-6 py-4 border-x-2 border-gray-400">
+                    {editingProductId === product._id ? (
                       <input
+                        id={`${product._id}-price`}
                         type="number"
-                        value={String(product.price)}
+                        value={
+                          editedValues[product._id]?.price ?? product.price
+                        }
                         onChange={(e) =>
                           handleInputChange(
                             product._id,
@@ -164,26 +181,25 @@ export const StockProductManage: React.FC = () => {
                         className="bg-slate-100 text-center rounded px-2 py-1 w-full"
                         onKeyDown={(e) => {
                           if (e.key === "Escape") {
-                            setProducts(
-                              products.map((p) =>
-                                p._id === product._id
-                                  ? { ...p, 'price': p['price'] }
-                                  : p
-                              )
-                            );
-                            setChangedProducts(
-                              changedProducts.filter(
-                                (p) => p._id !== product._id
-                              )
-                            );
+                            handleCancelEdit(product._id);
                           }
                         }}
                       />
-                    </td>
-                    <td className="px-6 py-4 ">
+                    ) : (
+                      <p onClick={() => handleFieldClick(product._id, "price")}>
+                        {editedValues[product._id]?.price ?? product.price}
+                      </p>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 ">
+                    {editingProductId === product._id ? (
                       <input
+                        id={`${product._id}-quantity`}
                         type="number"
-                        value={String(product.quantity)}
+                        value={
+                          editedValues[product._id]?.quantity ??
+                          product.quantity
+                        }
                         onChange={(e) =>
                           handleInputChange(
                             product._id,
@@ -194,24 +210,23 @@ export const StockProductManage: React.FC = () => {
                         className="bg-slate-100 text-center rounded px-2 py-1 w-full"
                         onKeyDown={(e) => {
                           if (e.key === "Escape") {
-                            setProducts(
-                              products.map((p) =>
-                                p._id === product._id
-                                  ? { ...p, 'quantity': p['quantity'] }
-                                  : p
-                              )
-                            );
-                            setChangedProducts(
-                              changedProducts.filter(
-                                (p) => p._id !== product._id
-                              )
-                            );
+                            handleCancelEdit(product._id);
                           }
                         }}
                       />
-                    </td>
-                  </tr>
-                ))}
+                    ) : (
+                      <p
+                        onClick={() =>
+                          handleFieldClick(product._id, "quantity")
+                        }
+                      >
+                        {editedValues[product._id]?.quantity ??
+                          product.quantity}
+                      </p>
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
