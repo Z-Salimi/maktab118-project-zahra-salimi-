@@ -128,13 +128,13 @@ export const StockProductManage: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <section className="flex flex-col px-8 py-2 w-full h-[90vh] rounded-xl">
+    <section className="flex flex-col px-8 py-10 w-full h-[90vh] rounded-xl">
       <div className="flex justify-between">
-        <h2 className="text-xl font-bold p-2">مدیریت موجودی و قیمت ها</h2>
+        <h2 className="text-xs md:text-xl font-bold p-2">مدیریت موجودی و قیمت ها</h2>
         <Button
           text="ذخیره"
           disabled={changedProducts.length === 0}
-          className="bg-green-600 hover:bg-green-700 rounded-md text-white w-1/6 mb-4"
+          className="bg-green-600 hover:bg-green-700 rounded-md text-white w-1/6 mb-4 flex justify-center items-center text-xs md:text-lg"
           onClick={handleSave}
         />
       </div>
@@ -143,13 +143,13 @@ export const StockProductManage: React.FC = () => {
           <table className="w-full table-auto bg-white">
             <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table table-fixed">
               <tr>
-                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">
+                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer text-center text-xs md:text-sm">
                   نام کالا
                 </th>
-                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">
+                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer text-xs md:text-sm">
                   قیمت
                 </th>
-                <th className="px-6 py-3">موجودی</th>
+                <th className="px-6 py-4 md:py-3 text-xs md:text-sm">موجودی</th>
               </tr>
             </thead>
             <tbody
@@ -162,8 +162,8 @@ export const StockProductManage: React.FC = () => {
                   key={product._id}
                   className="border-b-2 border-gray-400 w-full table table-fixed"
                 >
-                  <td className="px-6 py-4 ">{product.name}</td>
-                  <td className="px-6 py-4 border-x-2 border-gray-400">
+                  <td className="px-6 py-4 text-xs md:text-sm flex justify-center">{product.name}</td>
+                  <td className=" py-4 border-x-2 border-gray-400 text-xs md:text-sm w-20 md:w-40">
                     {editingProductId === product._id ? (
                       <input
                         id={`${product._id}-price`}
@@ -191,7 +191,7 @@ export const StockProductManage: React.FC = () => {
                       </p>
                     )}
                   </td>
-                  <td className="px-6 py-4 ">
+                  <td className="px-6 py-4 text-xs md:text-sm ">
                     {editingProductId === product._id ? (
                       <input
                         id={`${product._id}-quantity`}
