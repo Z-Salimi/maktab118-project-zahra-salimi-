@@ -85,66 +85,68 @@ export const AllProductManage: React.FC = () => {
   if (isError) return <div>Error: {isError}</div>;
 
   return (
-    <section className="flex flex-col p-10 w-full h-[90vh] rounded-xl">
+    <section className="flex flex-col py-10 w-full h-[90vh] rounded-xl mr-4 md:mr-0">
       <div className="flex flex-col justify-center items-end gap-4 w-full">
         <Button
           text="افزودن"
           className="bg-green-600 hover:bg-green-700 rounded-md text-white w-1/4"
           onClick={openModalCreate}
         />
-        <div className="w-full text-sm text-center bg-slate-50">
+        <div className="w-[90vw] md:w-full flex-col justify-center items-center text-sm text-center bg-slate-50">
           <table className="w-full table-auto bg-white">
             <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table table-fixed">
-              <tr>
-                <th className="px-6 py-3 cursor-pointer">تصویر</th>
-                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">
+              <tr className="border-b-2 border-gray-300 w-full table table-fixed text-xs md:text-sm">
+                <th className="px-6 py-3 cursor-pointer w-30">تصویر</th>
+                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer w-20 md:w-60">
                   نام کالا
                 </th>
-                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">
+                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer w-20 md:w-60">
                   دسته بندی
                 </th>
-                <th className="px-6 py-3">عملیات</th>
+                <th className="px-6 py-3 w-20 md:w-60">عملیات</th>
               </tr>
             </thead>
             <tbody
               dir="ltr"
-              className="bg-slate-50 h-[70vh] overflow-y-auto block w-full"
+              className="bg-slate-50 h-[60vh] overflow-y-auto block w-full"
             >
               {Array.isArray(data?.products) &&
                 data.products.map((product) => (
                   <tr
                     dir="rtl"
                     key={product._id}
-                    className="border-b-2 border-gray-300 w-full table table-fixed"
+                    className="border-b-2 border-gray-300 w-full table table-fixed text-xs md:text-sm"
                   >
-                    <td className="px-6 py-4 flex justify-center items-center">
+                    <td className="px-6 py-4 flex justify-center items-center w-full">
                       <img
                         src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                        className="w-50 h-20 rounded-lg"
+                        className="w-30 h-20 rounded-lg"
                         alt=""
                       />
                     </td>
-                    <td className="px-6 py-4 border-x-2">{product.name}</td>
-                    <td className="px-6 py-4 border-x-2 border-gray-300">
+                    <td className="px-6 py-4 border-x-2 w-20 md:w-60">{product.name}</td>
+                    <td className="px-6 py-4 border-x-2 border-gray-300 w-20 md:w-60">
                       {data.categories[product.category] ||
                         "در حال بارگذاری..."}
                       /
                       {data.subCategories[product.subcategory] ||
                         "در حال بارگذاری..."}
                     </td>
-                    <td className="px-6 py-4 ">
-                      <div className="flex items-center justify-center gap-4">
+                    <td className="px-6 py-4 w-20 md:w-60">
+                      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                        <div>
                         <Button
                           text="ویرایش"
-                          className="bg-slate-600 hover:bg-slate-700 rounded-md text-white"
+                          className="bg-slate-600 hover:bg-slate-700 rounded-md mb-2 md:mb-0 text-white text-xs mx-0 px-1 flex justify-center items-center md:px-6 md:py-1"
                           onClick={() => openModal(product)}
-                        />
+                          /></div>
+                          <div>
                         <Button
                           text="حذف"
-                          className="bg-red-600 hover:bg-red-700 rounded-md text-white"
+                          className="bg-red-600 hover:bg-red-700 rounded-md text-white text-xs mx-0 px-1 flex justify-center items-center md:px-6 md:py-1"
                           // onClick={() => handleDeleteProduct(product._id)}
                           onClick={() => openModalDelete(product)}
-                        />
+                        /></div>
                       </div>
                     </td>
                   </tr>
