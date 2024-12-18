@@ -7,6 +7,7 @@ const ManagementLayout = ({ children }: Readonly<{
   return (
     <div className="w-full flex">
       <NavbarManagement />
+      
       <main className="flex-grow flex flex-col justify-center items-center h-screen">
         {children}
       </main>
