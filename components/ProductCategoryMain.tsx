@@ -1,145 +1,84 @@
 "use client";
-import { getProductList } from "@/apis/services/product.service";
 import { ProductCard } from "./productCard";
-import { useEffect, useState } from "react";
-import { getCategoryById } from "@/apis/services/category.service";
-import { getSubCategoryById } from "@/apis/services/subCategory.service";
+import { useFetchProducts } from "@/hooks/useFetchProducts";
+import Link from "next/link";
 
 export const ProductCategoryMain: React.FC = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [categories, setCategories] = useState<Record<string, string>>({});
-  const [subCategories, setSubCategories] = useState<Record<string, string>>(
-    {}
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const currentPage = 1;
   const productsPerPage = 88;
-  const number = 5;
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProductList(currentPage, productsPerPage);
-        console.log("Fetched data:", data);
-        setProducts(data.products);
-        setTotalProducts(data.total);
-        console.log("Total products set:", data.total);
+  const { data, error, isLoading } = useFetchProducts(
+    currentPage,
+    productsPerPage
+  );
 
-        const subCategoryNames: Record<string, string> = {};
-        for (const product of data.products) {
-          const subCategoryData = await getSubCategoryById(product.subcategory);
-          subCategoryNames[product.subcategory] =
-            subCategoryData.subcategory.name;
-        }
-        setSubCategories(subCategoryNames);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-        setLoading(false);
-      } catch (error: any) {
-        console.error("Error in fetchProducts:", error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [currentPage]);
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  const categories = [
+    {
+      name: "گردنبند وآویز",
+      id: "674f5e9bd4ce8b2f706d402b",
+      link: "/categories/necklace",
+    },
+    {
+      name: "انگشتر",
+      id: "674f605dd4ce8b2f706d402c",
+      link: "/categories/ring",
+    },
+    {
+      name: "ست و نیم ست",
+      id: "674f60ced4ce8b2f706d402e",
+      link: "/categories/set",
+    },
+    {
+      name: "دستبند",
+      id: "674f6113d4ce8b2f706d402f",
+      link: "/categories/bracelet",
+    },
+    {
+      name: "گوشواره",
+      id: "674f614cd4ce8b2f706d4030",
+      link: "/categories/earring",
+    },
+  ];
 
   return (
     <section className="px-20 py-1 flex flex-col gap-20">
-
-      <div className="flex flex-col gap-4">
-        <h2 className="font-semibold text-2xl text-gray-700">گردنبند وآویز</h2>
-        <div className="flex justify-center items-center gap-6">
-          {products.map(
-            (product,index) =>
-                index<5 &&
-              product.category === "674f5e9bd4ce8b2f706d402b" && (
+      {categories.map((category) => (
+        <div
+          key={category.id}
+          className="flex flex-col justify-center items-center md:items-start gap-4"
+        >
+          <h2 className="font-semibold text-2xl text-gray-700">
+            {category.name}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:justify-center lg:items-center gap-6">
+            {data?.products
+              .filter((product) => product.category === category.id)
+              .slice(0, 3)
+              .map((product) => (
                 <ProductCard
                   key={product._id}
+                  productId={product._id}
                   title={product.name}
                   price={product.price}
                   src={`http://localhost:8000/images/products/images/${product.images[0]}`}
                 />
-              )
-          )}
-          <button className="text-lg text-gray-600 font-semibold bg-slate-300 px-3 py-32 rounded-xl">بیشتر</button>
+              ))}
+            <Link href={category.link}>
+              <button className="text-lg text-gray-600 font-semibold bg-slate-300 py-2 md:p-0 md:w-[10vw] md:h-[38vh] rounded-xl transition-all ease-in-out duration-300 hover:bg-slate-400 hover:text-white">
+                بیشتر
+              </button>
+            </Link>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <h2 className="font-semibold text-2xl text-gray-700">انگشتر</h2>
-        <div className="flex justify-center items-center gap-6">
-          {products.map(
-            (product,index) =>
-                index<25 &&
-              product.category === "674f605dd4ce8b2f706d402c" && (
-                <ProductCard
-                  key={product._id}
-                  title={product.name}
-                  price={product.price}
-                  src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                />
-              )
-          )}
-          <button className="text-lg text-gray-600 font-semibold bg-slate-300 px-3 py-32 rounded-xl">بیشتر</button>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <h2 className="font-semibold text-2xl text-gray-700">ست و نیم ست</h2>
-        <div className="flex justify-center items-center gap-6">
-          {products.map(
-            (product,index) =>
-                index<43 &&
-              product.category === "674f60ced4ce8b2f706d402e" && (
-                <ProductCard
-                  key={product._id}
-                  title={product.name}
-                  price={product.price}
-                  src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                />
-              )
-          )}
-          <button className="text-lg text-gray-600 font-semibold bg-slate-300 px-3 py-32 rounded-xl">بیشتر</button>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <h2 className="font-semibold text-2xl text-gray-700">دستبند</h2>
-        <div className="flex justify-center items-center gap-6">
-          {products.map(
-            (product,index) =>
-                index<62 &&
-              product.category === "674f6113d4ce8b2f706d402f" && (
-                <ProductCard
-                  key={product._id}
-                  title={product.name}
-                  price={product.price}
-                  src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                />
-              )
-          )}
-          <button className="text-lg text-gray-600 font-semibold bg-slate-300 px-3 py-32 rounded-xl">بیشتر</button>
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        <h2 className="font-semibold text-2xl text-gray-700">گوشواره</h2>
-        <div className="flex justify-center items-center gap-6">
-          {products.map(
-            (product,index) =>
-                index<82 &&
-              product.category === "674f614cd4ce8b2f706d4030" && (
-                <ProductCard
-                  key={product._id}
-                  title={product.name}
-                  price={product.price}
-                  src={`http://localhost:8000/images/products/images/${product.images[0]}`}
-                />
-              )
-          )}
-          <button className="text-lg text-gray-600 font-semibold bg-slate-300 px-3 py-32 rounded-xl">بیشتر</button>
-        </div>
-      </div>
-
-
+      ))}
     </section>
   );
 };
