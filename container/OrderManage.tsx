@@ -115,23 +115,23 @@ export const OrderManage: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <section className="flex flex-col p-10 w-full h-[90vh]">
+    <section className="flex flex-col py-10 w-full h-[90vh] items-center">
       <div className="flex justify-between">
-        <h2 className="text-xl font-bold p-2 text-white">مدیریت موجودی و قیمت ها</h2>
+        <h2 className="hidden md:flex pl-20 font-bold p-2 text-white">مدیریت موجودی و قیمت ها</h2>
         <div className="flex justify-center items-center mb-4 gap-4">
           <Button
             text="همه"
-            className={`px-4 py-2 ${filter === 'all' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
+            className={`px-1.5 md:px-4 md:py-2 ${filter === 'all' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
             onClick={() => setFilter('all')}
           />
           <Button
             text="تحویل داده شده"
-            className={`px-4 py-2 ${filter === 'delivered' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
+            className={`px-1 md:px-4 md:py-2 ${filter === 'delivered' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
             onClick={() => setFilter('delivered')}
           />
           <Button
             text="تحویل داده نشده"
-            className={`px-4 py-2 ${filter === 'notDelivered' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
+            className={`px-1 md:px-4 md:py-2 ${filter === 'notDelivered' ? 'bg-sky-600 text-white' : 'bg-sky-200 text-sky-700'} rounded-md`}
             onClick={() => setFilter('notDelivered')}
           />
         </div>
@@ -141,28 +141,28 @@ export const OrderManage: React.FC = () => {
           <table className="w-full table-auto bg-white">
             <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table">
               <tr>
-                <th className="px-6 py-3 cursor-pointer">نام کاربر</th>
-                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer">مجموع قیمت</th>
-                <th className="px-6 py-3 cursor-pointer">تعداد سفارش‌ها</th>
-                <th className="px-6 py-3 cursor-pointer">آخرین تاریخ سفارش</th>
-                <th className="px-6 py-3 cursor-pointer">تحویل داده شده</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">نام کاربر</th>
+                <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer text-xs md:text-sm">مجموع قیمت</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تعداد سفارش‌ها</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">آخرین تاریخ سفارش</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تحویل داده شده</th>
               </tr>
             </thead>
-            <tbody className="bg-slate-50 h-[70vh] overflow-y-auto block w-full">
+            <tbody className="bg-slate-50 h-[55vh] overflow-y-auto block w-full">
               {filteredOrders.map((summary) => (
                 <tr
                   key={summary.userId}
                   className="border-b-2 border-gray-300 w-full table table-fixed"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-xs md:text-sm">
                     {summary.userName}
                   </td>
-                  <td className="px-6 py-4 border-x-2">{summary.totalPrice}</td>
-                  <td className="px-6 py-4">{summary.orderCount}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">{summary.totalPrice}</td>
+                  <td className="px-6 py-4 text-xs md:text-sm">{summary.orderCount}</td>
+                  <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">
                     {moment(summary.lastOrderDate).format('jYYYY/jMM/jDD')}
                   </td>
-                  <td className="px-6 py-4">{summary.deliveryStatus ? "بله" : "خیر"}</td>
+                  <td className="px-6 py-4 text-xs md:text-sm">{summary.deliveryStatus ? "بله" : "خیر"}</td>
                 </tr>
               ))}
             </tbody>
