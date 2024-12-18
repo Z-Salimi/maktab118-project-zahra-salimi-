@@ -53,6 +53,29 @@ export const updateProduct = async (productId: string, updatedProduct: Partial<I
     throw new Error('Failed to update product');
   }
 };
+export const updateProductStock = async (productId: string, updatedProduct: Partial<IProduct>) => {
+  try {
+    const formData = new FormData();
+    
+    formData.append('price', `${updatedProduct.price || ''}`);
+    formData.append('quantity', `${updatedProduct.quantity || ''}`);
+
+
+    const response = await axios.patch(`http://localhost:8000/api/products/${productId}`, formData);
+
+    toast.success('ويرايش موفقيت آميز بود')
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // toast.error(error.message);
+      console.log(error.message);
+      
+    } else {
+      console.error('Unknown error:', error);
+    }
+    throw new Error('Failed to update product');
+  }
+};
 
 
 export const deleteProduct = async (productId: string) => {
