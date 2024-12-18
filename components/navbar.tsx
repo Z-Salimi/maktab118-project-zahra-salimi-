@@ -12,15 +12,16 @@ import { FilterSideBar } from "./filterSideBar";
 import Link from "next/link";
 import { Button } from "./button";
 import { Input } from "./input";
-import { FaUser, FaUserTie } from "react-icons/fa6";
+import { FaCartShopping, FaUser, FaUserTie } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 
 const navigation = [
-  { name: "گردنبند وآویز", href: "#", current: false },
-  { name: "انگشتر", href: "#", current: false },
-  { name: "ست ونیم ست", href: "#", current: false },
-  { name: "دستبند", href: "#", current: false },
-  { name: "گوشواره", href: "#", current: false },
+  { name: "صفحه اصلی", href: "/", current: false },
+  { name: "گردنبند وآویز", href: "/categories/necklace", current: false },
+  { name: "انگشتر", href: "/categories/ring", current: false },
+  { name: "ست ونیم ست", href: "/categories/set", current: false },
+  { name: "دستبند", href: "/categories/bracelet", current: false },
+  { name: "گوشواره", href: "/categories/earring", current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -56,6 +57,11 @@ export function Navbar() {
             <div className="hidden md:block w-[30vw]">
               <Input type="search" placeholder="جستجو..." />
             </div>
+            <div className="pr-40 items-center hidden md:flex">
+              <Link href={"/products/cart"}>
+                <FaCartShopping className="size-6 text-gray-600" />
+              </Link>
+            </div>
             <div className="pl-8">
               <div className=" justify-center items-center gap-4 hidden md:flex">
                 <Link href={"/auth/login"}>
@@ -66,11 +72,20 @@ export function Navbar() {
                 </Link>
               </div>
               <div className="flex justify-center items-center gap-4 md:hidden">
+                <Link href={"/products/cart"}>
+                  <FaCartShopping
+                    title="Cart"
+                    className="size-6 text-gray-600"
+                  />
+                </Link>
                 <Link title="User-Login" href={"/auth/login"}>
                   <FaUserCircle className="size-6 text-gray-600" />
                 </Link>
                 <Link href={"/admin/auth/login"}>
-                  <FaUserTie title="Admin-Login" className="size-6 text-gray-600" />
+                  <FaUserTie
+                    title="Admin-Login"
+                    className="size-6 text-gray-600"
+                  />
                 </Link>
               </div>
             </div>
