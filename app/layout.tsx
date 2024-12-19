@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/providers/toastify.provider";
 import RouteGuard from "@/providers/routeGuard";
 import { ReactQueryProvider } from "@/providers/queryClient";
+import { ReduxProvider } from "@/Redux/provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,14 +29,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <head> <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet" /> </head>
+      <head>
+        {" "}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap"
+          rel="stylesheet"
+        />{" "}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryProvider>
-        <RouteGuard>
-        <ToastProvider>{children}</ToastProvider>
-        </RouteGuard></ReactQueryProvider>
+        <ReduxProvider>
+          <ReactQueryProvider>
+            <RouteGuard>
+              <ToastProvider>{children}</ToastProvider>
+            </RouteGuard>
+          </ReactQueryProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
