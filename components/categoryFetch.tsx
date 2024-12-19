@@ -68,10 +68,10 @@ export const CategoryFetch: React.FC<ICategoryFetch> = ({id}) => {
                 .map((product) => (
                   <ProductCard
                     key={product._id}
-                    productId={product._id}
-                    title={product.name}
+                    id={product._id}
+                    name={product.name}
                     price={product.price}
-                    src={`http://localhost:8000/images/products/images/${product.images[0]}`}
+                    image={`http://localhost:8000/images/products/images/${product.images[0]}`}
                   />
                 ))}
               
