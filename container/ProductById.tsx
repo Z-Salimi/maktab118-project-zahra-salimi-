@@ -27,12 +27,13 @@ export const ProductById: React.FC = () => {
         .map((product) => (
           <ProductPage
           key={product._id}
-            image={product.images[0]}
-            title={product.name}
+            image={`http://localhost:8000/images/products/images/${product.images[0]}`}
+            name={product.name}
             description={product.description}
             quantity={product.quantity}
             price={product.price}
             brand={product.brand}
+            id={product._id}
           />
         ))}
     </section>
