@@ -65,14 +65,14 @@ export const ProductCategoryMain: React.FC = () => {
               .map((product) => (
                 <ProductCard
                   key={product._id}
-                  productId={product._id}
-                  title={product.name}
+                  id={product._id}
+                  name={product.name}
                   price={product.price}
-                  src={`http://localhost:8000/images/products/images/${product.images[0]}`}
+                  image={`http://localhost:8000/images/products/images/${product.images[0]}`}
                 />
               ))}
             <Link href={category.link}>
-              <button className="text-lg text-gray-600 font-semibold bg-slate-300 py-2 md:p-0 md:w-[10vw] md:h-[38vh] rounded-xl transition-all ease-in-out duration-300 hover:bg-slate-400 hover:text-white">
+              <button className="text-lg text-gray-600 font-semibold bg-slate-300 p-2 md:p-0 md:w-[10vw] md:h-[38vh] rounded-xl transition-all ease-in-out duration-300 hover:bg-slate-400 hover:text-white">
                 بیشتر
               </button>
             </Link>
