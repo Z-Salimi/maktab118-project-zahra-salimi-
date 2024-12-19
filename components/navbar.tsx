@@ -67,7 +67,7 @@ export function Navbar() {
             <div className="flex shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="digizarger.png"
+                src="/digizarger.png"
                 className="h-10 w-auto md:h-15"
               />
             </div>
