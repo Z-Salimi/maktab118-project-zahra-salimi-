@@ -1,3 +1,4 @@
+"use client";
 import {
   Disclosure,
   DisclosureButton,
@@ -12,8 +13,17 @@ import { FilterSideBar } from "./filterSideBar";
 import Link from "next/link";
 import { Button } from "./button";
 import { Input } from "./input";
-import { FaCartShopping, FaUser, FaUserTie } from "react-icons/fa6";
+import {
+  FaAngleDown,
+  FaCartShopping,
+  FaUser,
+  FaUserTie,
+} from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
+import { useState } from "react";
+import { CartDropdown } from "./cartDropdown";
+import { useAppSelector } from "@/Redux/hooks";
+import { RootState } from "@/Redux/store";
 
 const navigation = [
   { name: "صفحه اصلی", href: "/", current: false },
@@ -29,6 +39,13 @@ function classNames(...classes: string[]) {
 }
 
 export function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleCart = () => {
+    setIsOpen(!isOpen);
+  };
+  const cartItemsCount = useAppSelector(
+    (state: RootState) => state.cart.items.length
+  );
   return (
     <Disclosure as="nav" className="bg-gray-200 w-full px-3">
       <div className="w-full flex flex-col justify-center items-center">
@@ -57,13 +74,29 @@ export function Navbar() {
             <div className="hidden md:block w-[30vw]">
               <Input type="search" placeholder="جستجو..." />
             </div>
-            <div className="pr-40 items-center hidden md:flex">
-              <Link href={"/products/cart"}>
-                <FaCartShopping className="size-6 text-gray-600" />
-              </Link>
-            </div>
+
             <div className="pl-8">
               <div className=" justify-center items-center gap-4 hidden md:flex">
+                <div className=" items-center hidden md:flex  border-2 border-gray-400 rounded-full p-2 shadow-xl relative">
+                  <div className="flex items-center gap-2">
+                    <FaAngleDown
+                      onClick={toggleCart}
+                      className="ml-2 cursor-pointer"
+                    />
+                    {cartItemsCount > 0 && (
+                      <span className=" text-xs">
+                        {cartItemsCount}
+                      </span>
+                    )}
+                    <Link href={"/products/cart"}>
+                      <FaCartShopping
+                        className="size-6 text-gray-600"
+                        onClick={toggleCart}
+                      />
+                    </Link>
+                    {isOpen && <CartDropdown />}
+                  </div>
+                </div>
                 <Link href={"/auth/login"}>
                   <Button text="ورود" />
                 </Link>
@@ -71,13 +104,25 @@ export function Navbar() {
                   <Button text="پنل مدیریت" />
                 </Link>
               </div>
-              <div className="flex justify-center items-center gap-4 md:hidden">
-                <Link href={"/products/cart"}>
-                  <FaCartShopping
-                    title="Cart"
-                    className="size-6 text-gray-600"
+              <div className="flex justify-center items-center gap-4 md:hidden border-2 border-gray-300 rounded-full p-2">
+                <div className="flex items-center gap-2">
+                  <FaAngleDown
+                    onClick={toggleCart}
+                    className="ml-2 cursor-pointer"
                   />
-                </Link>
+                  {cartItemsCount > 0 && (
+                    <span className="text-xs ">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                  <Link href={"/products/cart"}>
+                    <FaCartShopping
+                      className="size-6 text-gray-600"
+                      onClick={toggleCart}
+                    />
+                  </Link>
+                  {isOpen && <CartDropdown />}
+                </div>
                 <Link title="User-Login" href={"/auth/login"}>
                   <FaUserCircle className="size-6 text-gray-600" />
                 </Link>
