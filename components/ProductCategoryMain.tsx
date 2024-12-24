@@ -58,10 +58,10 @@ export const ProductCategoryMain: React.FC = () => {
           <h2 className="font-semibold text-2xl text-gray-700">
             {category.name}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:justify-center lg:items-center gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:justify-center lg:items-center xl:flex gap-6 w-full">
             {data?.products
               .filter((product) => product.category === category.id)
-              .slice(0, 3)
+              .slice(0, 5)
               .map((product) => (
                 <ProductCard
                   key={product._id}

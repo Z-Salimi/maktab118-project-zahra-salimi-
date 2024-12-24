@@ -47,7 +47,7 @@ export const ProductCard: React.FC<IProductCard> = ({
       <h3 className="text-gray-600 text-lg font-semibold text-start px-4">
         {name}
       </h3>
-      <p className="text-gray-500 font-medium px-4">{price} تومان</p>
+      <p className="text-gray-500 font-medium px-4 whitespace-nowrap">{price} تومان</p>
       <div className="flex justify-center items-end h-full">
         {cartItem && cartItem.quantity > 0 ? (
           <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export const ProductCard: React.FC<IProductCard> = ({
         ) : (
           <button
             onClick={handleAddToCart}
-            className="bg-green-600 text-gray-100 py-1 p-4 rounded-xl shadow-[4px_4px_5px_lightgray] transition-all ease-in-out duration-500 hover:shadow-[-4px_-4px_5px_lightgray]"
+            className="bg-green-600 text-gray-100 py-1 p-4 rounded-xl whitespace-nowrap shadow-[4px_4px_5px_lightgray] transition-all ease-in-out duration-500 hover:shadow-[-4px_-4px_5px_lightgray]"
           >
             افزودن به سبد خرید
           </button>
