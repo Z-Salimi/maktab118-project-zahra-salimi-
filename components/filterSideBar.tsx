@@ -21,7 +21,7 @@ export const FilterSideBar: React.FC = () => {
         <Link href={"/"}>
           <Button
             text="صفحه اصلی"
-            className={`${isActive("/")} border-2 border-white `}
+            className={`${isActive("/")} border-2 border-white whitespace-nowrap`}
           />
         </Link>
         <Link href={"/categories/necklace"}>
@@ -29,7 +29,7 @@ export const FilterSideBar: React.FC = () => {
             text="گردبند و آویز"
             className={`${isActive(
               "/categories/necklace"
-            )} border-2 border-white `}
+            )} border-2 border-white whitespace-nowrap`}
           />
         </Link>
         <Link href={"/categories/ring"}>
@@ -37,7 +37,7 @@ export const FilterSideBar: React.FC = () => {
             text="انگشتر"
             className={`${isActive(
               "/categories/ring"
-            )} border-2 border-white `}
+            )} border-2 border-white whitespace-nowrap`}
           />
         </Link>
         <Link href={"/categories/set"}>
@@ -45,7 +45,7 @@ export const FilterSideBar: React.FC = () => {
             text="ست و نیم ست"
             className={`${isActive(
               "/categories/set"
-            )} border-2 border-white `}
+            )} border-2 border-white whitespace-nowrap`}
           />
         </Link>
         <Link href={"/categories/bracelet"}>
@@ -53,7 +53,7 @@ export const FilterSideBar: React.FC = () => {
             text="دستبند"
             className={`${isActive(
               "/categories/bracelet"
-            )} border-2 border-white `}
+            )} border-2 border-white whitespace-nowrap`}
           />
         </Link>
         <Link href={"/categories/earring"}>
@@ -61,7 +61,7 @@ export const FilterSideBar: React.FC = () => {
             text="گوشواره"
             className={`${isActive(
               "/categories/earring"
-            )} border-2 border-white `}
+            )} border-2 border-white whitespace-nowrap`}
           />
         </Link>
       </div>
