@@ -32,22 +32,22 @@ interface ISignup{
   role: string;
 }
 
-// export const signupRequest = async (data: {
-//   firstname: string;
-//   lastname: string;
-//   username: string;
-//   password: string;
-//   phoneNumber: string;
-//   address: string;
-// }) => {
-//   try {
-//     const response = await axios.post('http://localhost:8000/api/auth/signup', data);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Signup failed:', error);
-//     throw error;
-//   }
-// };
+export const signupRequest = async (data: {
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  phoneNumber: string;
+  address: string;
+}) => {
+  try {
+    const response = await axios.post('http://localhost:8000/api/auth/signup', data);
+    return response.data;
+  } catch (error) {
+    console.error('Signup failed:', error);
+    throw error;
+  }
+};
 
 export const logoutRequest = () => {
   clearToken();
