@@ -1,9 +1,9 @@
 import { FilterSideBar } from "@/components/filterSideBar";
-import  ImageSlider  from "@/components/sliderImg";
+import  ImageSlider  from "@/components/MainPage/sliderImg";
 import { Navbar } from "@/components/navbar";
-import { Benefit } from "@/components/benefit";
-import { ProductCategoryMain } from "@/components/ProductCategoryMain";
 import { Footer } from "@/components/footer";
+import { Benefit } from "@/components/MainPage/benefit";
+import { ProductCategoryMain } from "@/components/MainPage/ProductCategoryMain";
 
 
 export default function Home() {
