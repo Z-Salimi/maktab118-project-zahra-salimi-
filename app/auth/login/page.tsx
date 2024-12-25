@@ -1,8 +1,0 @@
-const LoginPage: React.FC =()=>{
-    return(
-        <section>
-            <h1>Login</h1>
-        </section>
-    )
-}
-export default LoginPage;
