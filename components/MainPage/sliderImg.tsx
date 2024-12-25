@@ -7,7 +7,6 @@ import image2 from "@/public/3-8.jpeg";
 import image3 from "@/public/6-1_11zon.jpeg";
 import image4 from "@/public/8-2_11zon.jpeg";
 import image5 from "@/public/9-1-1_11zon.jpeg";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Interface for image data
 interface ImageData {

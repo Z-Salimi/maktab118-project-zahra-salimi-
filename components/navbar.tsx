@@ -3,27 +3,20 @@ import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { FilterSideBar } from "./filterSideBar";
 import Link from "next/link";
 import { Button } from "./button";
 import { Input } from "./input";
-import {
-  FaAngleDown,
-  FaCartShopping,
-  FaUser,
-  FaUserTie,
-} from "react-icons/fa6";
-import { FaUserCircle } from "react-icons/fa";
+import { FaAngleDown, FaCartShopping } from "react-icons/fa6";
+import { FaUserCircle, FaUserTie } from "react-icons/fa";
 import { useState } from "react";
 import { CartDropdown } from "./cartDropdown";
 import { useAppSelector } from "@/Redux/hooks";
 import { RootState } from "@/Redux/store";
+import { logoutRequest } from "@/apis/services/auth.service";
+import { MdExitToApp } from "react-icons/md";
 
 const navigation = [
   { name: "صفحه اصلی", href: "/", current: false },
@@ -46,6 +39,17 @@ export function Navbar() {
   const cartItemsCount = useAppSelector(
     (state: RootState) => state.cart.items.length
   );
+
+  const username =
+    typeof window !== "undefined" ? localStorage.getItem("username") : null;
+  const role =
+    typeof window !== "undefined" ? localStorage.getItem("role") : null;
+
+  const handleLogout = () => {
+    logoutRequest();
+    window.location.href = "/"; // Redirect to home after logout
+  };
+
   return (
     <Disclosure as="nav" className="bg-gray-200 w-full px-3">
       <div className="w-full flex flex-col justify-center items-center">
@@ -63,7 +67,7 @@ export function Navbar() {
               />
             </DisclosureButton>
           </div>
-          <div className="flex items-center justify-between w-full px-4">
+          <div className="flex items-center justify-between w-full">
             <div className="flex shrink-0 items-center">
               <img
                 alt="Your Company"
@@ -76,17 +80,15 @@ export function Navbar() {
             </div>
 
             <div className="pl-8">
-              <div className=" justify-center items-center gap-4 hidden md:flex">
-                <div className=" items-center hidden md:flex  border-2 border-gray-400 rounded-full p-2 shadow-xl relative">
+              <div className="justify-center items-center gap-4 hidden md:flex">
+                <div className="items-center hidden md:flex border-2 border-gray-400 rounded-full p-2 shadow-xl relative">
                   <div className="flex items-center gap-2">
                     <FaAngleDown
                       onClick={toggleCart}
                       className="ml-2 cursor-pointer"
                     />
                     {cartItemsCount > 0 && (
-                      <span className=" text-xs">
-                        {cartItemsCount}
-                      </span>
+                      <span className="text-xs">{cartItemsCount}</span>
                     )}
                     <Link href={"/products/cart"}>
                       <FaCartShopping
@@ -97,23 +99,39 @@ export function Navbar() {
                     {isOpen && <CartDropdown />}
                   </div>
                 </div>
-                <Link href={"/auth/login"}>
-                  <Button text="ورود" />
-                </Link>
-                <Link href={"/admin/auth/login"}>
-                  <Button text="پنل مدیریت" />
-                </Link>
+                {username ? (
+                  <>
+                    <span className="text-gray-600 flex items-center justify-center gap-2">
+                      {username}
+                      <FaUserCircle className="size-6 text-gray-600" />
+                    </span>
+
+                    <button
+                      className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded-xl"
+                      onClick={handleLogout}
+                    >
+                      خروج
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href={"/users/auth/login"}>
+                      <Button text="ورود" />
+                    </Link>
+                    <Link href={"/admin/auth/login"}>
+                      <Button text="پنل مدیریت" />
+                    </Link>
+                  </>
+                )}
               </div>
-              <div className="flex justify-center items-center gap-4 md:hidden border-2 border-gray-300 rounded-full p-2">
+              <div className="flex justify-center items-center gap-2 md:hidden border-2 border-gray-300 rounded-full p-1">
                 <div className="flex items-center gap-2">
                   <FaAngleDown
                     onClick={toggleCart}
                     className="ml-2 cursor-pointer"
                   />
                   {cartItemsCount > 0 && (
-                    <span className="text-xs ">
-                      {cartItemsCount}
-                    </span>
+                    <span className="text-xs">{cartItemsCount}</span>
                   )}
                   <Link href={"/products/cart"}>
                     <FaCartShopping
@@ -123,15 +141,31 @@ export function Navbar() {
                   </Link>
                   {isOpen && <CartDropdown />}
                 </div>
-                <Link title="User-Login" href={"/auth/login"}>
-                  <FaUserCircle className="size-6 text-gray-600" />
-                </Link>
-                <Link href={"/admin/auth/login"}>
-                  <FaUserTie
-                    title="Admin-Login"
-                    className="size-6 text-gray-600"
-                  />
-                </Link>
+                {username ? (
+                  <>
+                    <span className="text-gray-600 flex items-center justify-center gap-2">
+                      <FaUserCircle className="size-6 text-gray-600" />
+                    </span>
+                    <button
+                      className="text-white px-3 py-2 rounded-xl"
+                      onClick={handleLogout}
+                    >
+                      <MdExitToApp className="size-6 text-gray-600" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link title="User-Login" href={"/auth/login"}>
+                      <FaUserCircle className="size-6 text-gray-600" />
+                    </Link>
+                    <Link href={"/admin/auth/login"}>
+                      <FaUserTie
+                        title="Admin-Login"
+                        className="size-6 text-gray-600"
+                      />
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

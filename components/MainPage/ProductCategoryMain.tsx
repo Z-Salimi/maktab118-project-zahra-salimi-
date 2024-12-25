@@ -1,7 +1,7 @@
 "use client";
-import { ProductCard } from "./productCard";
 import { useFetchProducts } from "@/hooks/useFetchProducts";
 import Link from "next/link";
+import { ProductCard } from "../productCard";
 
 export const ProductCategoryMain: React.FC = () => {
   const currentPage = 1;
@@ -58,10 +58,10 @@ export const ProductCategoryMain: React.FC = () => {
           <h2 className="font-semibold text-2xl text-gray-700">
             {category.name}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:justify-center lg:items-center xl:flex gap-6 w-full">
+          <div className="flex flex-col justify-center items-center md:grid md:grid-cols-2 lg:grid-cols-3  xl:grid-cols-5 gap-6 w-full">
             {data?.products
               .filter((product) => product.category === category.id)
-              .slice(0, 5)
+              .slice(0, 4)
               .map((product) => (
                 <ProductCard
                   key={product._id}
