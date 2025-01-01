@@ -1,28 +1,5 @@
-// 'use client';
-// import { useEffect } from 'react';
-// import { getToken } from '@/utils/session.managment';
-// import { usePathname, useRouter } from 'next/navigation';
-
-// interface IChild{
-//     children:any;
-// }
-// const RouteGuard = ({ children }:IChild) => {
-//   const router = useRouter();
-//   const path = usePathname();
-//   useEffect(() => {
-//     const token = getToken();
-//     if (!token && path.includes("admin")) {
-//       router.push('/admin/auth/login');
-//     }
-//   }, [router]);
-
-//   return children;
-// };
-
-// export default RouteGuard;
-
-
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getToken } from "@/utils/session.managment";
@@ -42,21 +19,17 @@ const RouteGuard: React.FC<IChild> = ({ children }) => {
     const role = localStorage.getItem("role");
 
     if (!token) {
-      toast.error("برای ادامه روند لطفا وارد شوید");
-
-      if (!path.includes("/login") && !path.includes("/signup")) {
+      if (path.includes("cart")) {
+        toast.error("برای ادامه روند لطفا وارد شوید");
         router.push("/users/auth/login");
-      } else {
+      }  else {
         setIsAuthLoaded(true);
       }
     } else {
       if (path.includes("/admin") && role !== "ADMIN") {
-      toast.error("کاربر گرامی شما اجازه دسترسی به این سیستم را ندارید");
+        toast.error("کاربر گرامی شما اجازه دسترسی به این سیستم را ندارید");
         router.push("/");
-      } else if (role !== "USER" && !path.includes("/admin")) {
-      toast.error("مدیر گرامی شما اجازه دسترسی به این سیستم را ندارید");
-        router.push("/users/auth/login");
-      } else {
+      }  else {
         setIsAuthLoaded(true);
       }
     }
@@ -66,7 +39,7 @@ const RouteGuard: React.FC<IChild> = ({ children }) => {
     return null;
   }
 
-  return isAuthLoaded && children;
+  return children;
 };
 
 export default RouteGuard;

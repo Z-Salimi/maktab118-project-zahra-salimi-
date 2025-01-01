@@ -5,6 +5,7 @@ interface IButton {
   className?: string;
   text: string;
   onClick?: ()=> void;
+  disabled?: boolean;
 }
 
 export const Button: React.FC<IButton> = ({ className="", text, ...props }) => {
