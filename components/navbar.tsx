@@ -155,7 +155,7 @@ export function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link title="User-Login" href={"/auth/login"}>
+                    <Link title="User-Login" href={"/users/auth/login"}>
                       <FaUserCircle className="size-6 text-gray-600" />
                     </Link>
                     <Link href={"/admin/auth/login"}>
