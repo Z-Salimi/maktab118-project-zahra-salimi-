@@ -1,6 +1,6 @@
 import { FilterSideBar } from "@/components/filterSideBar";
 import { Footer } from "@/components/footer";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar/navbar";
 import { NavbarManagement } from "@/components/navbarManage";
 import React from "react";
 

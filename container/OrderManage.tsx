@@ -103,6 +103,11 @@ export const OrderManage: React.FC = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+  const handleStatus = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   const filteredOrders = userOrderSummary.filter((summary) => {
     if (filter === 'all') return true;
@@ -146,6 +151,7 @@ export const OrderManage: React.FC = () => {
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تعداد سفارش‌ها</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">آخرین تاریخ سفارش</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تحویل داده شده</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm"> تغییر وضعیت به</th>
               </tr>
             </thead>
             <tbody className="bg-slate-50 h-[55vh] overflow-y-auto block w-full">
@@ -163,6 +169,8 @@ export const OrderManage: React.FC = () => {
                     {moment(summary.lastOrderDate).format('jYYYY/jMM/jDD')}
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm">{summary.deliveryStatus ? "بله" : "خیر"}</td>
+                  <td className="px-6 py-4 text-xs md:text-sm">
+                    <button className="bg-slate-300 px-4 py-2 rounded-lg">{summary.deliveryStatus ? "خیر" : "بله"}</button></td>
                 </tr>
               ))}
             </tbody>

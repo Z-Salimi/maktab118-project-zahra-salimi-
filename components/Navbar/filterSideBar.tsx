@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { Button } from "./button";
 import { usePathname } from "next/navigation";
+import { Button } from "../button";
 
 export const FilterSideBar: React.FC = () => {
   const path = usePathname();
