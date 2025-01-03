@@ -14,6 +14,7 @@ export const loginRequest = async (username: string, password: string): Promise<
     
     setToken(token, tokenExpiration);
     localStorage.setItem('username', response.data.data.user.username);
+    localStorage.setItem('userId', response.data.data.user._id);
     localStorage.setItem('role', response.data.data.user.role);
     return { token, role, username: response.data.data.user.username };
   } catch (error) {
@@ -53,4 +54,5 @@ export const logoutRequest = () => {
   clearToken();
   localStorage.removeItem('username');
   localStorage.removeItem('role');
+  localStorage.removeItem('userId');
 };
