@@ -1,6 +1,6 @@
-import { FilterSideBar } from "@/components/filterSideBar";
+
 import  ImageSlider  from "@/components/MainPage/sliderImg";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar/navbar";
 import { Footer } from "@/components/footer";
 import { Benefit } from "@/components/MainPage/benefit";
 import { ProductCategoryMain } from "@/components/MainPage/ProductCategoryMain";
