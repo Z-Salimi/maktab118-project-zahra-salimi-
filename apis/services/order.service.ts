@@ -19,3 +19,50 @@ export const getOrders = async (page = 1, limit = 10): Promise<IResOrders> => {
     throw new Error('Failed to fetch orders');
   }
 };
+
+
+
+// Create a new order
+export const createOrder = async (orderData: IOrder) => {
+  try {
+    const response = await axios.post('/api/orders', orderData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating order', error);
+    throw error;
+  }
+};
+
+// Update an existing order
+export const updateOrder = async (orderId: string, updatedData: Partial<Irder>) => {
+  try {
+    const response = await axios.patch(`/api/orders/${orderId}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating order', error);
+    throw error;
+  }
+};
+
+// Delete an order by ID
+export const deleteOrder = async (orderId: string) => {
+  try {
+    const response = await axios.delete(`/api/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting order', error);
+    throw error;
+  }
+};
+
+
+// Get order by ID
+export const getOrderById = async (orderId: string) => {
+  try {
+    const response = await axios.get(`/api/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order', error);
+    throw error;
+  }
+};
