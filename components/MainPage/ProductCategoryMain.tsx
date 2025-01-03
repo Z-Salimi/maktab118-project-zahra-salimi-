@@ -6,6 +6,7 @@ import { ProductCard } from "../productCard";
 export const ProductCategoryMain: React.FC = () => {
   const currentPage = 1;
   const productsPerPage = 88;
+  const userId = localStorage.getItem('userId');  // Replace with actual user ID retrieval logic
 
   const { data, error, isLoading } = useFetchProducts(
     currentPage,
@@ -69,6 +70,7 @@ export const ProductCategoryMain: React.FC = () => {
                   name={product.name}
                   price={product.price}
                   image={`http://localhost:8000/images/products/images/${product.images[0]}`}
+                  userId={userId}
                 />
               ))}
             <Link href={category.link}>
