@@ -48,3 +48,15 @@ export const removeFromCart = async (userId: string, productId: string): Promise
     return { items: [] };
   }
 };
+
+export const clearCart = async (userId: string): Promise<Cart> => {
+  try {
+    const response = await axios.post('http://localhost:8000/api/cart/clear', {
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing cart", error);
+    return { items: [] };
+  }
+};

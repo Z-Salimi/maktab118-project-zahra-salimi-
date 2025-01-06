@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { addToCart, getCart, removeFromCart } from '@/apis/services/cart.service';
+import { getCart, removeFromCart } from '@/apis/services/cart.service';
 import { ProductCard } from './productCard';
 import { Button } from './button';
 
@@ -10,12 +10,16 @@ interface CartItem {
   name: string;
   quantity: number;
   price: number;
-  image: string;
+  image: string[];
 }
 
 interface Cart {
   items: CartItem[];
 }
+
+const useUserId = (): string | null => {
+  return localStorage.getItem('userId');
+};
 
 export const CartComponent: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -26,7 +30,6 @@ export const CartComponent: React.FC = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const id = localStorage.getItem("userId");
-      console.log("User ID from localStorage:", id);
       setUserId(id);
     }
   }, []);
@@ -37,8 +40,6 @@ export const CartComponent: React.FC = () => {
         try {
           setLoading(true);
           const response = await getCart(userId);
-          console.log("Fetched cart data:", response);
-
           const cartData = response.data?.cart?.products?.map((item: any) => ({
             productId: item.product._id,
             name: item.product.name,
@@ -59,12 +60,21 @@ export const CartComponent: React.FC = () => {
     fetchCart();
   }, [userId]);
 
+  const handleRemoveFromCart = async (productId: string) => {
+    if (userId) {
+      try {
+        const updatedCart = await removeFromCart(userId, productId);
+        setCart({ items: updatedCart.items || [] });
+      } catch (err) {
+        console.error('Error removing item from cart', err);
+      }
+    }
+  };
+
   const handleClearCart = async () => {
     if (userId) {
       try {
-        
-        const clearedCart = { items: [] };
-        setCart(clearedCart);
+        setCart({ items: [] });
         localStorage.setItem("cartItems", JSON.stringify([]));
       } catch (err) {
         console.error('Error clearing cart', err);
@@ -75,25 +85,26 @@ export const CartComponent: React.FC = () => {
   if (loading) return <div>در حال بارگذاری...</div>;
   if (error) return <div>{error}</div>;
 
-  const totalPrice = cart.items?.reduce((total, item) => total + item.price * item.quantity, 0) || 0;
+  const totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <section className="flex flex-col justify-center items-center gap-4">
-      {cart?.items.length === 0 ? (
+      {cart.items.length === 0 ? (
         <p className="text-gray-50 bg-orange-500 p-4 rounded-full">
           سبد خرید شما خالی است
         </p>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cart?.items.map((item) => (
+            {cart.items.map((item) => (
               <ProductCard
                 key={item.productId}
                 id={item.productId}
                 name={item.name}
                 price={item.price}
-                image={item.image}
+                image={`http://localhost:8000/images/products/images/${item.image}`}
                 userId={userId}
+                onRemove={() => handleRemoveFromCart(item.productId)}
               />
             ))}
           </div>
@@ -118,3 +129,5 @@ export const CartComponent: React.FC = () => {
     </section>
   );
 };
+
+
