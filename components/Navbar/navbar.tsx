@@ -1,6 +1,5 @@
-// components/Navbar.tsx
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Disclosure,
   DisclosureButton,
@@ -15,12 +14,31 @@ import { UserSection } from "./UserSection";
 import { useRouter } from "next/navigation";
 import { logoutRequest } from "@/apis/services/auth.service";
 import { classNames, navigation } from "@/utils/navigation";
+import { useCart } from '@/providers/cartContex';
+
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
-  const cartItemsCount = 0;
+  const [cartItemsCount, setCartItemsCount] = useState(0);
+  const { itemCount, setItemCount } = useCart();
+
   const username =
     typeof window !== "undefined" ? localStorage.getItem("username") : null;
+
+  useEffect(() => {
+    const fetchCartItemsCount = () => {
+      const products = (localStorage.getItem("products"));
+      setCartItemsCount(products);
+    };
+
+    fetchCartItemsCount();
+
+    window.addEventListener("storage", fetchCartItemsCount);
+
+    return () => {
+      window.removeEventListener("storage", fetchCartItemsCount);
+    };
+  }, [localStorage.getItem("products")]);
 
   const handleLogout = () => {
     logoutRequest();
@@ -57,7 +75,7 @@ export const Navbar: React.FC = () => {
 
             <div className="pl-8">
               <div className="justify-center items-center gap-4 hidden md:flex">
-                <CartIcon cartItemsCount={cartItemsCount} />
+                <CartIcon cartItemsCount={itemCount} />
                 <UserSection username={username} handleLogout={handleLogout} />
               </div>
             </div>
