@@ -55,4 +55,5 @@ export const logoutRequest = () => {
   localStorage.removeItem('username');
   localStorage.removeItem('role');
   localStorage.removeItem('userId');
+  localStorage.removeItem('products');
 };

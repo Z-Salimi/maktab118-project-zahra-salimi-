@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import moment from "moment-jalaali";
-import { getOrders } from "@/apis/services/order.service";
+import { getOrders, updateDeliveryStatus } from "@/apis/services/order.service";
 import { getUsers } from "@/apis/services/user.service";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
@@ -9,12 +9,16 @@ import { Button } from "@/components/button";
 import { useTokenExpiration } from "@/hooks/loginExp";
 
 interface IUserOrderSummary {
+  orderId: string;
   userId: string;
   userName: string;
   totalPrice: number;
   orderCount: number;
   lastOrderDate: string;
   deliveryStatus: boolean;
+  userAddress:string;
+  userPhone: number | string;
+  deliveryDate: string | null;
 }
 
 export const OrderManage: React.FC = () => {
@@ -59,22 +63,25 @@ export const OrderManage: React.FC = () => {
 
   const groupOrdersByUser = (orders: IOrder[], users: IUser[]): IUserOrderSummary[] => {
     const userOrdersMap: Record<string, IUserOrderSummary> = {};
-
+  
     orders.forEach((order) => {
       if (!userOrdersMap[order.user]) {
-        console.log("usersss:" ,users);
-        
         const user = users.find((u) => u._id === order.user);
-        console.log('Order user ID:', order.user, 'Matched user:', user);
         const userName = user ? `${user.firstname} ${user.lastname}` : 'نامشخص';
-
+        const userAddress = user?.address || 'نامشخص';
+        const userPhone = user?.phoneNumber || 'نامشخص';
+  
         userOrdersMap[order.user] = {
+          orderId: order._id,
           userId: order.user,
           userName,
+          userAddress,
+          userPhone,
           totalPrice: 0,
           orderCount: 0,
           lastOrderDate: order.createdAt,
           deliveryStatus: order.deliveryStatus,
+          deliveryDate: order.deliveryDate,
         };
       } else {
         if (new Date(order.createdAt) > new Date(userOrdersMap[order.user].lastOrderDate)) {
@@ -85,9 +92,10 @@ export const OrderManage: React.FC = () => {
       userOrdersMap[order.user].orderCount += 1;
       userOrdersMap[order.user].deliveryStatus = userOrdersMap[order.user].deliveryStatus && order.deliveryStatus;
     });
-
+  
     return Object.values(userOrdersMap);
   };
+  
 
   const totalPages = Math.ceil(totalOrders / ordersPerPage);
   console.log('Total pages:', totalPages);
@@ -103,9 +111,18 @@ export const OrderManage: React.FC = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-  const handleStatus = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+
+  const handleStatusChange = async (orderId: string, currentStatus: boolean) => {
+    try {
+      const newStatus = !currentStatus;
+      await updateDeliveryStatus(orderId, newStatus);
+      setUserOrderSummary((prevSummaries) =>
+        prevSummaries.map((summary) =>
+          summary.orderId === orderId ? { ...summary, deliveryStatus: newStatus } : summary
+        )
+      );
+    } catch (error) {
+      console.error("Error updating delivery status", error);
     }
   };
 
@@ -143,34 +160,44 @@ export const OrderManage: React.FC = () => {
       </div>
       <div className="flex justify-center rounded-lg w-full">
         <div className="w-full text-sm text-center">
-          <table className="w-full table-auto bg-white">
+          <table className="w-full bg-white">
             <thead className="text-[16px] text-gray-700 bg-slate-300 w-full table">
-              <tr>
+              <tr className="grid grid-cols-9">
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">نام کاربر</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تلفن</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">آدرس</th>
                 <th className="px-6 py-3 border-x-2 border-gray-300 cursor-pointer text-xs md:text-sm">مجموع قیمت</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تعداد سفارش‌ها</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">آخرین تاریخ سفارش</th>
+                <th className="px-6 py-3 cursor-pointer text-xs md:text-sm"> تاریخ تحویل</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm">تحویل داده شده</th>
                 <th className="px-6 py-3 cursor-pointer text-xs md:text-sm"> تغییر وضعیت به</th>
               </tr>
             </thead>
-            <tbody className="bg-slate-50 h-[55vh] overflow-y-auto block w-full">
+            <tbody className="bg-slate-50 h-[55vh] overflow-auto block w-full">
               {filteredOrders.map((summary) => (
                 <tr
                   key={summary.userId}
-                  className="border-b-2 border-gray-300 w-full table table-fixed"
+                  className="border-b-2 border-gray-300 w-full  grid grid-cols-9"
                 >
                   <td className="px-6 py-4 text-xs md:text-sm">
                     {summary.userName}
                   </td>
+                  <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">{summary.userPhone}</td>
+                  <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center flex-wrap">{summary.userAddress}</td>
                   <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">{summary.totalPrice}</td>
                   <td className="px-6 py-4 text-xs md:text-sm">{summary.orderCount}</td>
                   <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">
                     {moment(summary.lastOrderDate).format('jYYYY/jMM/jDD')}
                   </td>
+                  <td className="px-6 py-4 border-x-2 text-xs md:text-sm flex justify-center items-center">
+                    {moment(summary.deliveryDate).format('jYYYY/jMM/jDD')}
+                  </td>
                   <td className="px-6 py-4 text-xs md:text-sm">{summary.deliveryStatus ? "بله" : "خیر"}</td>
-                  <td className="px-6 py-4 text-xs md:text-sm">
-                    <button className="bg-slate-300 px-4 py-2 rounded-lg">{summary.deliveryStatus ? "خیر" : "بله"}</button></td>
+                  <td className="px-6 py-4 border-r-2 text-xs md:text-sm">
+                    <button
+                    onClick={()=>handleStatusChange(summary.orderId,summary.deliveryStatus)}
+                    className="bg-slate-300 px-4 py-2 rounded-lg">{summary.deliveryStatus ? "خیر" : "بله"}</button></td>
                 </tr>
               ))}
             </tbody>

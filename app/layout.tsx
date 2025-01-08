@@ -5,6 +5,7 @@ import { ToastProvider } from "@/providers/toastify.provider";
 import RouteGuard from "@/providers/routeGuard";
 import { ReactQueryProvider } from "@/providers/queryClient";
 import { ReduxProvider } from "@/Redux/provider";
+import { CartProvider } from '@/providers/cartContex';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,12 +39,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
+        {/* <ReduxProvider> */}
+<CartProvider>
           <ReactQueryProvider>
             <RouteGuard>
               <ToastProvider>{children}</ToastProvider>
             </RouteGuard>
-          </ReactQueryProvider>
+          </ReactQueryProvider></CartProvider>
+        {/* </ReduxProvider> */}
        
       </body>
     </html>
