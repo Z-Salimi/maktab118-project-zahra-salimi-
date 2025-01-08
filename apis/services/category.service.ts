@@ -7,7 +7,6 @@ export const getCategoryById: getCategoryByIdType = async (id) => {
     const response = await axios.get<{ data: ICategory }>(
       `${urls.categories.All}/${id}`
     );
-    console.log("Response:", response.data.data);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

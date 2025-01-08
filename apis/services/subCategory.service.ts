@@ -7,7 +7,6 @@ export const getSubCategoryById: getSubCategoryByIdType = async (id) => {
     const response = await axios.get<{ data: ISubCategory }>(
       `${urls.subCategories.All}/${id}`
     );
-    console.log("Response:", response.data.data);
     return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -28,8 +27,7 @@ export const getSubCategoryList = async (
       params: { page, limit },
     });
     const subCategories = response.data.data.subcategories;
-    console.log('subbbb', subCategories);
-    
+
     const total = response.data.total;
     return { subCategories, total };
   } catch (error) {

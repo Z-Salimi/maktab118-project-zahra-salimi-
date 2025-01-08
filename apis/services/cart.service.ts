@@ -15,7 +15,7 @@ interface Cart {
 export const getCart = async (userId: string): Promise<Cart> => {
   try {
     const response = await axios.get(`http://localhost:8000/api/cart/${userId}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching cart", error);
     return { items: [] };
@@ -45,6 +45,18 @@ export const removeFromCart = async (userId: string, productId: string): Promise
     return response.data;
   } catch (error) {
     console.error("Error removing from cart", error);
+    return { items: [] };
+  }
+};
+
+export const clearCart = async (userId: string): Promise<Cart> => {
+  try {
+    const response = await axios.post('http://localhost:8000/api/cart/clear', {
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing cart", error);
     return { items: [] };
   }
 };
