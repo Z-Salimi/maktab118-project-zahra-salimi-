@@ -15,6 +15,8 @@ export const CategoryFetch: React.FC<ICategoryFetch> = ({id}) => {
       currentPage,
       productsPerPage
     );
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+
   
     if (isLoading) {
       return <div>Loading...</div>;
@@ -72,6 +74,7 @@ export const CategoryFetch: React.FC<ICategoryFetch> = ({id}) => {
                     name={product.name}
                     price={product.price}
                     image={`http://localhost:8000/images/products/images/${product.images[0]}`}
+                    userId={userId}
                   />
                 ))}
               

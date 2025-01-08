@@ -1,9 +1,21 @@
+<<<<<<< HEAD
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getCart, removeFromCart } from '@/apis/services/cart.service';
 import { ProductCard } from './productCard';
 import { Button } from './button';
+=======
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  clearCart,
+  getCart,
+} from "@/apis/services/cart.service";
+import { ProductCard } from "./productCard";
+import { Button } from "./button";
+>>>>>>> 0.6.1
 
 interface CartItem {
   productId: string;
@@ -26,6 +38,12 @@ export const CartComponent: React.FC = () => {
   const [cart, setCart] = useState<Cart>({ items: [] });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+
+  
+  const calculateTotalPrice = (items: CartItem[]): number => {
+    return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -34,6 +52,7 @@ export const CartComponent: React.FC = () => {
     }
   }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     const fetchCart = async () => {
       if (userId) {
@@ -47,16 +66,33 @@ export const CartComponent: React.FC = () => {
             price: item.product.price,
             image: item.product.image,
           })) || [];
+=======
+  const fetchCart = async () => {
+    if (userId) {
+      try {
+        setLoading(true);
+        const response = await getCart(userId);
 
-          setCart({ items: cartData });
-        } catch (err) {
-          setError('Error fetching cart');
-        } finally {
-          setLoading(false);
-        }
+        const cartData = response?.cart?.products?.map((item: any) => ({
+          productId: item.product._id,
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price,
+          image: item.product.images[0],
+        })) || [];
+>>>>>>> 0.6.1
+
+        setCart({ items: cartData });
+        setTotalPrice(calculateTotalPrice(cartData));
+      } catch (err) {
+        setError("Error fetching cart");
+      } finally {
+        setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchCart();
   }, [userId]);
 
@@ -72,21 +108,35 @@ export const CartComponent: React.FC = () => {
   };
 
   const handleClearCart = async () => {
+<<<<<<< HEAD
     if (userId) {
       try {
         setCart({ items: [] });
         localStorage.setItem("cartItems", JSON.stringify([]));
       } catch (err) {
         console.error('Error clearing cart', err);
+=======
+    try {
+      if (userId) {
+        const updatedCart = await clearCart(userId);
+        const clearedCart: Cart = { items: [] };
+        setCart(updatedCart.cart?.products || clearedCart);
+        setTotalPrice(0);
+>>>>>>> 0.6.1
       }
+    } catch (error) {
+      console.error("Error clearing cart:", error);
     }
   };
 
   if (loading) return <div>در حال بارگذاری...</div>;
   if (error) return <div>{error}</div>;
 
+<<<<<<< HEAD
   const totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
 
+=======
+>>>>>>> 0.6.1
   return (
     <section className="flex flex-col justify-center items-center gap-4">
       {cart.items.length === 0 ? (
@@ -103,8 +153,13 @@ export const CartComponent: React.FC = () => {
                 name={item.name}
                 price={item.price}
                 image={`http://localhost:8000/images/products/images/${item.image}`}
+<<<<<<< HEAD
                 userId={userId}
                 onRemove={() => handleRemoveFromCart(item.productId)}
+=======
+                userId={userId!}
+                onQuantityChange={fetchCart}
+>>>>>>> 0.6.1
               />
             ))}
           </div>
@@ -112,7 +167,7 @@ export const CartComponent: React.FC = () => {
             <p className="text-xl text-gray-700 font-bold border-2 border-gray-400 p-3 rounded-full">
               قیمت نهایی: {totalPrice} تومان
             </p>
-            <Link href={"/products/cart/result"}>
+            <Link href={"/products/cart/contact"}>
               <Button
                 text="نهایی کردن خرید"
                 className="px-4 py-3 bg-green-700 text-white"

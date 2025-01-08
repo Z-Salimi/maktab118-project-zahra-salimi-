@@ -23,9 +23,9 @@ export const getOrders = async (page = 1, limit = 10): Promise<IResOrders> => {
 
 
 // Create a new order
-export const createOrder = async (orderData: IOrder) => {
+export const createOrder = async (orderData: IOrderCreate) => {
   try {
-    const response = await axios.post('/api/orders', orderData);
+    const response = await axios.post(urls.orders, orderData);
     return response.data;
   } catch (error) {
     console.error('Error creating order', error);
@@ -34,9 +34,9 @@ export const createOrder = async (orderData: IOrder) => {
 };
 
 // Update an existing order
-export const updateOrder = async (orderId: string, updatedData: Partial<Irder>) => {
+export const updateOrder = async (orderId: string, updatedData: Partial<IOrder>) => {
   try {
-    const response = await axios.patch(`/api/orders/${orderId}`, updatedData);
+    const response = await axios.patch(`${urls.orders}/${orderId}`, updatedData);
     return response.data;
   } catch (error) {
     console.error('Error updating order', error);
@@ -66,3 +66,16 @@ export const getOrderById = async (orderId: string) => {
     throw error;
   }
 };
+
+
+export const updateDeliveryStatus = async (orderId: string, deliveryStatus: boolean) => {
+  try {
+    const response = await axios.patch(`${urls.orders}/${orderId}`, { deliveryStatus });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating delivery status', error);
+    throw error;
+  }
+};
+
+

@@ -15,7 +15,7 @@ interface Cart {
 export const getCart = async (userId: string): Promise<Cart> => {
   try {
     const response = await axios.get(`http://localhost:8000/api/cart/${userId}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching cart", error);
     return { items: [] };

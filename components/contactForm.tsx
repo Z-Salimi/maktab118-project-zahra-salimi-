@@ -6,9 +6,26 @@ import { Input } from "./input";
 import { DatePicker } from "zaman";
 import moment from "moment-jalaali";
 import { ContactFormSchema } from "@/validation/contactForm.validation";
-import axios from "axios";
-import Link from "next/link";
+import { getUserInfo } from "@/apis/services/user.service";
 import { createOrder } from "@/apis/services/order.service";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { getCart, clearCart } from "@/apis/services/cart.service";
+
+interface CartItem {
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+  image: string;
+}
+
+interface IContactForm {
+  fullName: string;
+  phone: string;
+  address: string;
+  deliveryDate: Date | null;
+}
 
 export const ContactForm = () => {
   const {
@@ -16,22 +33,25 @@ export const ContactForm = () => {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<ContactFormSchema>({
+  } = useForm<IContactForm>({
     resolver: zodResolver(ContactFormSchema),
   });
 
-  const userId = localStorage.getItem("userId");
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get(`/api/users/${userId}`);
-        const data = response.data;
-        setValue("fullName", data.fullName);
-        setValue("email", data.email);
-        setValue("phone", data.phone);
-        setValue("address", data.address);
-        setValue("deliveryDate", moment(data.deliveryDate).toDate());
+        if (userId) {
+          const data = await getUserInfo(userId);
+          console.log("User info fetched:", data);
+          
+          setValue("fullName", `${data.data.user.firstname} ${data.data.user.lastname}`);
+          setValue("phone", data.data.user.phoneNumber);
+          setValue("address", data.data.user.address);
+        }
       } catch (error) {
         console.error("Error fetching user info", error);
       }
@@ -39,33 +59,73 @@ export const ContactForm = () => {
     fetchUserInfo();
   }, [userId, setValue]);
 
-  const onSubmit = async (data: ContactFormSchema) => {
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        if (userId) {
+          const cart = await getCart(userId);
+          console.log("Cart items fetched:", cart.cart.products);
+          setCartItems(cart.cart.products);
+        }
+      } catch (error) {
+        console.error("Error fetching cart items", error);
+      }
+    };
+    fetchCartItems();
+  }, [userId]);
+
+  const onSubmit = async (data: IContactForm) => {
+    console.log("onSubmit called with data:", data);
+    const deliveryDate = data.deliveryDate ? moment(data.deliveryDate).toDate() : moment().add(1, 'week').toDate();
+    console.log("onSubmitttttt:", deliveryDate);
+
+    if (moment(deliveryDate).isAfter(moment().add(1, 'month'))) {
+      console.error("Delivery date cannot be more than one month from today.");
+      toast.error("تاریخ تحویل نمی‌تواند بیشتر از یک ماه از امروز باشد.");
+      return;
+    }
+
+    if (moment(deliveryDate).isSameOrBefore(moment(), 'day')) {
+      console.error("Delivery date cannot be today or before.");
+      toast.error("تاریخ تحویل نمی‌تواند امروز یا قبل از امروز باشد.");
+      return;
+    }
+
     try {
-      
       const orderData = {
-        user: userId,
-        products: JSON.parse(localStorage.getItem("cartItems") || "[]"),
-        deliveryDate: data.deliveryDate,
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
+        user: userId!,
+        products: cartItems.map(item => ({
+          product: item.product._id,
+          count: item.quantity
+        })),
+        deliveryStatus: false,
+        deliveryDate: deliveryDate.toISOString()
       };
-      const response = await createOrder(orderData); 
+
+      console.log("Order data to be sent:", orderData);
+      const response = await createOrder(orderData);
       console.log("Order created:", response);
-      window.location.href = "/products/cart/payment";
+
+      await clearCart(userId!);
+
+      localStorage.removeItem("products");
+
+      router.push("/products/cart/payment");
     } catch (error) {
+      if (error.response) {
+        console.error("Server response:", error.response.data);
+      }
       console.error("Error creating order", error);
     }
   };
 
   const minDate = moment();
-  const maxDate = moment().add(2, "months");
+  const maxDate = moment().add(1, "month");
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center gap-4 border border-slate-300 bg-slate-50 rounded-lg  w-[50vw] px-8 py-4 text-sm shadow-md"
+      className="flex flex-col items-center gap-4 border border-slate-300 bg-slate-50 rounded-lg w-[50vw] px-8 py-4 text-sm shadow-md"
     >
       <div className="w-full">
         <Controller
@@ -78,23 +138,6 @@ export const ContactForm = () => {
               label="نام کامل:"
               placeholder="نام کامل"
               error={errors.fullName?.message}
-              {...field}
-            />
-          )}
-        />
-      </div>
-
-      <div className="w-full">
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <Input
-              type="email"
-              className="w-full"
-              label="ایمیل:"
-              placeholder="ایمیل"
-              error={errors.email?.message}
               {...field}
             />
           )}
@@ -157,14 +200,13 @@ export const ContactForm = () => {
           )}
         />
       </div>
-      <Link href={"/products/cart/payment"}>
-        <button
-          type="submit"
-          className="bg-gray-600 px-6 py-1 rounded-xl w-full text-gray-100 font-semibold border-r-2 border-b-2 border-gray-100 shadow-[4px_4px_5px_lightgray] transition-all ease-in-out duration-500 hover:shadow-[-4px_-4px_5px_lightgray]"
-        >
-          ارسال
-        </button>
-      </Link>
+      
+      <button
+        type="submit"
+        className="bg-gray-600 px-6 py-1 rounded-xl w-full text-gray-100 font-semibold border-r-2 border-b-2 border-gray-100 shadow-[4px_4px_5px_lightgray] transition-all ease-in-out duration-500 hover:shadow-[-4px_-4px_5px_lightgray]"
+      >
+        ارسال
+      </button>
     </form>
   );
 };

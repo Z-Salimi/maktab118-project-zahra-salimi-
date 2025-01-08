@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { addToCart, removeFromCart, getCart } from '@/apis/services/cart.service'; // Import your services
+import { addToCart, removeFromCart, getCart } from '@/apis/services/cart.service';
+import { useCart } from '@/providers/cartContex';
 
 interface IProductCard {
   name: string;
@@ -8,6 +9,7 @@ interface IProductCard {
   image: string;
   id: string;
   userId: string;
+  onQuantityChange?: () => void; 
 }
 
 export const ProductCard: React.FC<IProductCard> = ({
@@ -16,16 +18,18 @@ export const ProductCard: React.FC<IProductCard> = ({
   image,
   id,
   userId,
+  onQuantityChange,
 }) => {
   const [quantity, setQuantity] = useState<number>(0);
   const [cart, setCart] = useState<any>({ items: [] });
+  const { itemCount, setItemCount } = useCart();
 
   useEffect(() => {
     const fetchCart = async () => {
       if (userId) {
         try {
           const response = await getCart(userId);
-          const cartData = response.data?.cart?.products?.map((item: any) => ({
+          const cartData = response?.cart?.products?.map((item: any) => ({
             productId: item.product._id,
             name: item.product.name,
             quantity: item.quantity,
@@ -36,6 +40,8 @@ export const ProductCard: React.FC<IProductCard> = ({
 
           const cartItem = cartData.find((item: any) => item.productId === id);
           if (cartItem) {
+            localStorage.setItem('products', cart.items.length);
+            setItemCount(cart.items.length);
             setQuantity(cartItem.quantity);
           }
         } catch (error) {
@@ -63,6 +69,9 @@ export const ProductCard: React.FC<IProductCard> = ({
         if (cartItem) {
           setQuantity(cartItem.quantity);
         }
+        if (onQuantityChange) {
+          onQuantityChange();
+        }
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
@@ -85,6 +94,9 @@ export const ProductCard: React.FC<IProductCard> = ({
         const cartItem = updatedCartData.find((item: any) => item.productId === id);
         if (cartItem) {
           setQuantity(cartItem.quantity);
+        }
+        if (onQuantityChange) {
+          onQuantityChange();
         }
       } catch (error) {
         console.error("Error increasing quantity:", error);
@@ -110,6 +122,9 @@ export const ProductCard: React.FC<IProductCard> = ({
           if (cartItem) {
             setQuantity(cartItem.quantity);
           }
+          if (onQuantityChange) {
+            onQuantityChange();
+          }
         } catch (error) {
           console.error("Error decreasing quantity:", error);
         }
@@ -125,6 +140,9 @@ export const ProductCard: React.FC<IProductCard> = ({
           })) || [];
           setCart({ items: updatedCartData });
           setQuantity(0);
+          if (onQuantityChange) {
+            onQuantityChange();
+          }
         } catch (error) {
           console.error("Error removing item from cart:", error);
         }
