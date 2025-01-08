@@ -19,3 +19,9 @@ interface IOrder {
       orders: IOrder[];
     };
   }
+  interface IOrderCreate {
+    user: string;
+    products: Array<{ product: string; count: number }>;
+    deliveryStatus: boolean;
+  }
+  
