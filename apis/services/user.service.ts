@@ -13,7 +13,7 @@ export const getUsers = async (): Promise<IUser[]> => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('Response:', response.data);
+    console.log('ResponseUser:', response.data);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching users:', error);
